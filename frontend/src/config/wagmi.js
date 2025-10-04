@@ -1,11 +1,11 @@
 import { http, createConfig } from 'wagmi';
-import { injected } from 'wagmi/connectors';
+import { injected, metaMask } from 'wagmi/connectors';
 
-// Define Paseo Testnet
-export const paseoTestnet = {
-  id: parseInt(import.meta.env.VITE_CHAIN_ID || '42161'),
-  name: import.meta.env.VITE_CHAIN_NAME || 'Paseo Testnet',
-  network: 'paseo',
+// Configure the Polkadot Hub TestNet chain
+export const polkadotHubTestnet = {
+  id: parseInt(import.meta.env.VITE_CHAIN_ID || '420420422'),
+  name: import.meta.env.VITE_CHAIN_NAME || 'Polkadot Hub TestNet',
+  network: 'polkadot-hub-testnet',
   nativeCurrency: {
     decimals: 18,
     name: 'PAS',
@@ -13,33 +13,33 @@ export const paseoTestnet = {
   },
   rpcUrls: {
     default: {
-      http: [import.meta.env.VITE_RPC_URL || 'https://rpc.ibp.network/paseo'],
+      http: [import.meta.env.VITE_RPC_URL || 'https://testnet-passet-hub-eth-rpc.polkadot.io'],
     },
     public: {
-      http: [import.meta.env.VITE_RPC_URL || 'https://rpc.ibp.network/paseo'],
+      http: [import.meta.env.VITE_RPC_URL || 'https://testnet-passet-hub-eth-rpc.polkadot.io'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'Polkadot Explorer',
-      url: import.meta.env.VITE_BLOCK_EXPLORER || 'https://polkadot.js.org/apps/',
+      name: 'Polkadot Hub Explorer',
+      url: import.meta.env.VITE_BLOCK_EXPLORER || 'https://blockscout-passet-hub.parity-testnet.parity.io/',
     },
   },
   testnet: true,
 };
 
+// Create Wagmi config
 export const config = createConfig({
-  chains: [paseoTestnet],
+  chains: [polkadotHubTestnet],
   connectors: [
-    injected({ 
-      target: 'metaMask',
-      shimDisconnect: true,
-    }),
+    injected(),
+    metaMask(),
   ],
   transports: {
-    [paseoTestnet.id]: http(),
+    [polkadotHubTestnet.id]: http(),
   },
 });
 
-export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
-export const ADMIN_ADDRESS = import.meta.env.VITE_ADMIN_ADDRESS || '0x0000000000000000000000000000000000000000';
+// Contract configuration
+export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x080ec10E35F00aA427Bceb40D902A28B8333c63C';
+export const ADMIN_ADDRESS = import.meta.env.VITE_ADMIN_ADDRESS || '0x8E1ffdbbe8770F4f82dD14915Cd68285516C1c05';
