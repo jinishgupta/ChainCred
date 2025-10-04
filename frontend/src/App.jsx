@@ -9,6 +9,7 @@ import UniversityPage from './pages/UniversityPage';
 import StudentPage from './pages/StudentPage';
 import VerifyPage from './pages/VerifyPage';
 import TestPage from './pages/TestPage';
+import AdminPage from './pages/AdminPage';
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ function App() {
                 <Route path="/student" element={<StudentPage />} />
                 <Route path="/verify" element={<VerifyPage />} />
                 <Route path="/verify/:id" element={<VerifyPage />} />
+                <Route path="/admin" element={<AdminPage />} />
                 <Route path="/test" element={<TestPage />} />
               </Routes>
             </main>

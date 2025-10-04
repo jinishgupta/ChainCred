@@ -16,6 +16,7 @@ export default function Navbar() {
     { name: 'University', href: '/university' },
     { name: 'Student', href: '/student' },
     { name: 'Verify', href: '/verify' },
+    { name: 'Admin', href: '/admin' },
     { name: 'Test', href: '/test', highlight: true },
   ];
 

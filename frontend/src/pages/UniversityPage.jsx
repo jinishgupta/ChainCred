@@ -1,20 +1,28 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
 import { toast } from 'sonner';
-import { University, Plus, List, Loader2, AlertCircle } from 'lucide-react';
+import { University, Plus, List, Loader2, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { CONTRACT_ADDRESS } from '../config/wagmi';
 import { CHAINCRED_ABI } from '../config/abi';
 import { formatAddress, formatDate, DEGREE_TYPES, MAJOR_FIELDS } from '../utils/helpers';
+import { uploadCredentialToIPFS } from '../utils/ipfs';
 
 export default function UniversityPage() {
   const { address, isConnected } = useAccount();
   const [activeView, setActiveView] = useState('issue');
+  const [isUploadingToIPFS, setIsUploadingToIPFS] = useState(false);
+  
+  const [registrationData, setRegistrationData] = useState({
+    name: '',
+    country: '',
+    registrationNumber: '',
+  });
   
   const [formData, setFormData] = useState({
     studentAddress: '',
     studentName: '',
     studentId: '',
-    university: 'Universidad de Buenos Aires',
+    university: '',
     degree: '',
     major: '',
     issueDate: new Date().toISOString().split('T')[0],
@@ -24,6 +32,20 @@ export default function UniversityPage() {
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
+  const { data: universityInfo, refetch: refetchUniversityInfo } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: CHAINCRED_ABI,
+    functionName: 'getUniversityInfo',
+    args: [address],
+  });
+  
+  const { data: universityStatus } = useReadContract({
+    address: CONTRACT_ADDRESS,
+    abi: CHAINCRED_ABI,
+    functionName: 'getUniversityStatus',
+    args: [address],
+  });
+  
   const { data: isUniversity } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CHAINCRED_ABI,
@@ -38,11 +60,54 @@ export default function UniversityPage() {
     args: [address],
   });
 
+  useEffect(() => {
+    if (universityInfo && universityInfo.name) {
+      setFormData(prev => ({ ...prev, university: universityInfo.name }));
+    }
+  }, [universityInfo]);
+  
+  useEffect(() => {
+    if (isSuccess) {
+      refetchUniversityInfo();
+      refetch();
+    }
+  }, [isSuccess]);
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
+  
+  const handleRegistrationChange = (e) => {
+    const { name, value } = e.target;
+    setRegistrationData(prev => ({ ...prev, [name]: value }));
+  };
 
+  const handleRegistration = async (e) => {
+    e.preventDefault();
+    
+    if (!registrationData.name || !registrationData.country || !registrationData.registrationNumber) {
+      toast.error('Please fill all required fields');
+      return;
+    }
+
+    try {
+      await writeContract({
+        address: CONTRACT_ADDRESS,
+        abi: CHAINCRED_ABI,
+        functionName: 'registerUniversity',
+        args: [
+          registrationData.name,
+          registrationData.country,
+          registrationData.registrationNumber,
+        ],
+      });
+      toast.success('University registration submitted! Awaiting admin approval.');
+    } catch (error) {
+      toast.error(error.message || 'Failed to register university');
+    }
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -52,6 +117,25 @@ export default function UniversityPage() {
     }
 
     try {
+      // Upload credential metadata to IPFS
+      setIsUploadingToIPFS(true);
+      toast.info('Uploading credential metadata to IPFS...');
+      
+      const ipfsCID = await uploadCredentialToIPFS({
+        studentAddress: formData.studentAddress,
+        studentName: formData.studentName,
+        studentId: formData.studentId,
+        university: formData.university,
+        degree: formData.degree,
+        major: formData.major,
+        issueDate: formData.issueDate,
+        graduationDate: formData.graduationDate,
+      });
+      
+      setIsUploadingToIPFS(false);
+      toast.success('Metadata uploaded to IPFS!');
+      
+      // Now mint the credential with IPFS CID
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
@@ -65,10 +149,12 @@ export default function UniversityPage() {
           formData.major,
           formData.issueDate,
           formData.graduationDate,
+          ipfsCID,
         ],
       });
       toast.success('Credential issuance initiated!');
     } catch (error) {
+      setIsUploadingToIPFS(false);
       toast.error(error.message || 'Failed to issue credential');
     }
   };
@@ -99,16 +185,144 @@ export default function UniversityPage() {
     );
   }
 
-  if (!isUniversity) {
+  // Status: 0 = NotRegistered, 1 = Pending, 2 = Verified, 3 = Rejected
+  const status = universityStatus !== undefined ? Number(universityStatus) : 0;
+  
+  // If university is not registered, show registration form
+  if (status === 0) {
+    return (
+      <div className="min-h-screen py-12 px-4">
+        <div className="max-w-2xl mx-auto">
+          <div className="card">
+            <div className="flex items-center space-x-3 mb-6">
+              <University className="h-10 w-10 text-primary-600" />
+              <div>
+                <h1 className="text-3xl font-bold">University Registration</h1>
+                <p className="text-slate-600">Register your university to issue credentials</p>
+              </div>
+            </div>
+            
+            <form onSubmit={handleRegistration} className="space-y-6">
+              <div>
+                <label className="block text-sm font-medium mb-2">University Name *</label>
+                <input
+                  type="text"
+                  name="name"
+                  value={registrationData.name}
+                  onChange={handleRegistrationChange}
+                  placeholder="Universidad de Buenos Aires"
+                  className="input-field"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Country *</label>
+                <input
+                  type="text"
+                  name="country"
+                  value={registrationData.country}
+                  onChange={handleRegistrationChange}
+                  placeholder="Argentina"
+                  className="input-field"
+                  required
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium mb-2">Registration Number *</label>
+                <input
+                  type="text"
+                  name="registrationNumber"
+                  value={registrationData.registrationNumber}
+                  onChange={handleRegistrationChange}
+                  placeholder="Official registration or license number"
+                  className="input-field"
+                  required
+                />
+              </div>
+              
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                <p className="text-sm text-blue-800">
+                  <strong>Note:</strong> After registration, an administrator will review and verify your university. 
+                  You will be able to issue credentials once approved.
+                </p>
+              </div>
+              
+              <button
+                type="submit"
+                disabled={isPending || isConfirming}
+                className="btn-primary w-full"
+              >
+                {isPending || isConfirming ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin inline" />
+                    {isPending ? 'Submitting...' : 'Confirming...'}
+                  </>
+                ) : (
+                  'Register University'
+                )}
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    );
+  }
+  
+  // If university is pending verification
+  if (status === 1) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="card max-w-md w-full text-center">
+          <Clock className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-bold mb-2">Pending Verification</h2>
+          <p className="text-slate-600 mb-4">
+            Your university registration is pending approval from an administrator.
+          </p>
+          {universityInfo && (
+            <div className="bg-slate-50 rounded-lg p-4 text-left">
+              <p className="text-sm mb-1"><strong>University:</strong> {universityInfo.name}</p>
+              <p className="text-sm mb-1"><strong>Country:</strong> {universityInfo.country}</p>
+              <p className="text-sm mb-1"><strong>Registration #:</strong> {universityInfo.registrationNumber}</p>
+              <p className="text-sm"><strong>Address:</strong> {formatAddress(address)}</p>
+            </div>
+          )}
+          <p className="text-sm text-slate-500 mt-4">
+            Please wait for admin approval. You will be notified once your university is verified.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
+  // If university was rejected
+  if (status === 3) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
         <div className="card max-w-md w-full text-center">
           <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
+          <h2 className="text-2xl font-bold mb-2">Registration Rejected</h2>
           <p className="text-slate-600 mb-4">
-            This address does not have university privileges. Contact the admin to get access.
+            Your university registration was rejected by an administrator.
           </p>
           <p className="text-sm text-slate-500">Your address: {formatAddress(address)}</p>
+          <p className="text-sm text-slate-500 mt-2">
+            Please contact support for more information.
+          </p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Status 2 = Verified - show the full university portal
+  if (!isUniversity) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="card max-w-md w-full text-center">
+          <Loader2 className="h-16 w-16 text-primary-600 mx-auto mb-4 animate-spin" />
+          <h2 className="text-2xl font-bold mb-2">Loading...</h2>
+          <p className="text-slate-600">Verifying university status...</p>
         </div>
       </div>
     );
@@ -258,10 +472,15 @@ export default function UniversityPage() {
               
               <button
                 type="submit"
-                disabled={isPending || isConfirming}
+                disabled={isPending || isConfirming || isUploadingToIPFS}
                 className="btn-primary w-full"
               >
-                {isPending || isConfirming ? (
+                {isUploadingToIPFS ? (
+                  <>
+                    <Loader2 className="h-5 w-5 mr-2 animate-spin inline" />
+                    Uploading to IPFS...
+                  </>
+                ) : isPending || isConfirming ? (
                   <>
                     <Loader2 className="h-5 w-5 mr-2 animate-spin inline" />
                     {isPending ? 'Submitting...' : 'Confirming...'}

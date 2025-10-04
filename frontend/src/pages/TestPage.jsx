@@ -6,6 +6,8 @@ import { CONTRACT_ADDRESS, ADMIN_ADDRESS } from '../config/wagmi';
 import { CHAINCRED_ABI } from '../config/abi';
 import { formatAddress, formatDate } from '../utils/helpers';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { ConnectWallet } from '../components/ConnectWallet';
+import { NetworkInfo } from '../components/NetworkInfo';
 
 export default function TestPage() {
   const { address, isConnected } = useAccount();
@@ -127,6 +129,7 @@ export default function TestPage() {
 
   const tabs = [
     { id: 'info', label: 'Contract Info' },
+    { id: 'network', label: 'Network Debug' },
     { id: 'admin', label: 'Admin Functions' },
     { id: 'issue', label: 'Issue Credential' },
     { id: 'verify', label: 'Verify Credential' },
@@ -261,6 +264,44 @@ export default function TestPage() {
                     <div>
                       <h4 className="font-semibold">Revoke Credential (Issuer Only)</h4>
                       <p className="text-sm text-slate-600">Invalidate a credential that was issued</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'network' && (
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-xl font-semibold mb-4">Network & Wallet Debug</h3>
+                  <p className="text-sm text-slate-600 mb-6">
+                    This section helps debug network connection issues and wallet compatibility.
+                  </p>
+                </div>
+                
+                <div className="space-y-6">
+                  <div>
+                    <h4 className="text-lg font-semibold mb-3">Wallet Connection</h4>
+                    <ConnectWallet />
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-lg font-semibold mb-3">Network Information</h4>
+                    <NetworkInfo />
+                  </div>
+                  
+                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                    <h4 className="text-lg font-semibold mb-2 text-blue-800">Troubleshooting</h4>
+                    <div className="text-sm text-blue-700 space-y-2">
+                      <p>• If you see "Wrong Network", add Polkadot Hub TestNet to your wallet manually:</p>
+                      <div className="bg-white p-3 rounded border font-mono text-xs">
+                        Network Name: Polkadot Hub TestNet<br/>
+                        RPC URL: https://testnet-passet-hub-eth-rpc.polkadot.io<br/>
+                        Chain ID: 420420422<br/>
+                        Currency Symbol: PAS
+                      </div>
+                      <p>• If transactions fail, ensure you have PAS tokens from the faucet</p>
+                      <p>• If MetaMask shows Sepolia, manually switch to Polkadot Hub TestNet</p>
                     </div>
                   </div>
                 </div>

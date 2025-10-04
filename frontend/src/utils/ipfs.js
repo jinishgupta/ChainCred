@@ -1,76 +1,142 @@
-import dotenv from 'dotenv';
-dotenv.config();
+import { create } from 'ipfs-http-client';
 
-import { PinataSDK } from 'pinata';
-import { Blob, File } from 'buffer';
+// IPFS client configuration
+// Using public IPFS gateway - for production, use a dedicated service like Pinata, Infura, or Web3.Storage
+let ipfsClient;
 
-const pinata = new PinataSDK({
-  pinataJwt: process.env.PINATA_JWT,
-  pinataGateway: process.env.GATEWAY_URL
-});
-
-// Upload image file to IPFS
-const uploadImageToIPFS = async (req, res) => {
-  try {
-    const imageBlob = new Blob([req.file.buffer]);
-    const imageFile = new File([imageBlob], req.file.originalname, { type: req.file.mimetype });
-    let imageUpload = pinata.upload.public.file(imageFile);
-    if (req.body.group) imageUpload = imageUpload.group(req.body.group);
-    if (req.body.imageName) imageUpload = imageUpload.name(req.body.imageName);
-    if (req.body.keyvalues) imageUpload = imageUpload.keyvalues(req.body.keyvalues);
-    const imageResult = await imageUpload;
-    res.json({
-    success: true,
-      imageCid: imageResult.cid,
-      imageUrl: `${process.env.GATEWAY_URL}/ipfs/${imageResult.cid}`
-    });
-} catch (error) {
-    res.status(500).json({ success: false, message: error.message });
+const getIPFSClient = () => {
+  if (!ipfsClient) {
+    // Try to use local IPFS node
+    try {
+      ipfsClient = create({
+        host: 'localhost',
+        port: 5001,
+        protocol: 'http',
+      });
+    } catch (error) {
+      console.warn('Could not connect to local IPFS node. Using public gateway.');
+      // Fallback to a public IPFS gateway
+      ipfsClient = create({
+        host: 'ipfs.infura.io',
+        port: 5001,
+        protocol: 'https',
+      });
+    }
   }
+  return ipfsClient;
 };
 
-// Utility function to upload metadata JSON to IPFS (no file, just data)
-async function uploadMetadataToIPFS(data) {
-  // Limit metadata size
-  if (JSON.stringify(data).length > 10 * 1024) {
-    throw new Error('Metadata too large.');
+/**
+ * Upload credential metadata to IPFS
+ * @param {Object} credentialData - The credential data to upload
+ * @returns {Promise<string>} - The IPFS CID
+ */
+export async function uploadCredentialToIPFS(credentialData) {
+  try {
+    // Create metadata object in NFT standard format
+    const metadata = {
+      name: `ChainCred Certificate - ${credentialData.studentName}`,
+      description: `Educational Credential: ${credentialData.degree} in ${credentialData.major} from ${credentialData.university}`,
+      image: 'ipfs://QmYourDefaultCredentialImageCID', // You can customize this
+      attributes: [
+        {
+          trait_type: 'Student Name',
+          value: credentialData.studentName,
+        },
+        {
+          trait_type: 'Student ID',
+          value: credentialData.studentId,
+        },
+        {
+          trait_type: 'University',
+          value: credentialData.university,
+        },
+        {
+          trait_type: 'Degree',
+          value: credentialData.degree,
+        },
+        {
+          trait_type: 'Major',
+          value: credentialData.major,
+        },
+        {
+          trait_type: 'Issue Date',
+          value: credentialData.issueDate,
+        },
+        {
+          trait_type: 'Graduation Date',
+          value: credentialData.graduationDate,
+        },
+        {
+          trait_type: 'Issue Timestamp',
+          value: new Date().toISOString(),
+        },
+      ],
+      credentialData: credentialData,
+    };
+
+    const client = getIPFSClient();
+    const metadataString = JSON.stringify(metadata);
+    const result = await client.add(metadataString);
+    
+    console.log('Uploaded to IPFS with CID:', result.path);
+    return result.path; // This is the CID
+  } catch (error) {
+    console.error('Error uploading to IPFS:', error);
+    throw new Error('Failed to upload credential metadata to IPFS: ' + error.message);
   }
-  let metadataUpload = pinata.upload.public.json(data);
-  if (data.name) {
-    metadataUpload = metadataUpload.name(data.name + '.json');
-  }
-  const metadataResult = await metadataUpload;
-  return {
-    success: true,
-    metadataCid: metadataResult.cid,
-    metadataUrl: `${process.env.GATEWAY_URL}/ipfs/${metadataResult.cid}`,
-    id: metadataResult.id
-  };
 }
 
-// Upload NFT metadata JSON to IPFS (no file)
-const uploadDataToIPFS = async (req, res) => {
+/**
+ * Retrieve credential metadata from IPFS
+ * @param {string} cid - The IPFS CID
+ * @returns {Promise<Object>} - The credential metadata
+ */
+export async function getCredentialFromIPFS(cid) {
   try {
-    const data = req.body;
-    const result = await uploadMetadataToIPFS(data);
-    res.json(result);
-  } catch (error) {
-    res.status(500).json({ success: false, message: error.message });
-  }
-};
+    const client = getIPFSClient();
+    
+    const stream = client.cat(cid);
+    const decoder = new TextDecoder();
+    let data = '';
 
-// Get NFT metadata by CID
-const getDataByCid = async (req, res) => {
-  try {
-    const { cid } = req.params;
-    return `${process.env.GATEWAY_URL}/ipfs/${cid}`;
-  } catch (error) {
-    res.status(404).json({ success: false, message: 'NFT not found' });
-  }
-};
+    for await (const chunk of stream) {
+      data += decoder.decode(chunk, { stream: true });
+    }
 
-export {
-  uploadImageToIPFS,
-  uploadDataToIPFS,
-  getDataByCid,
-};
+    return JSON.parse(data);
+  } catch (error) {
+    console.error('Error retrieving from IPFS:', error);
+    // Fallback to HTTP gateway
+    try {
+      const response = await fetch(getIPFSUrl(cid));
+      return await response.json();
+    } catch (fetchError) {
+      throw new Error('Failed to retrieve credential metadata from IPFS: ' + error.message);
+    }
+  }
+}
+
+/**
+ * Get IPFS gateway URL for a CID
+ * @param {string} cid - The IPFS CID
+ * @returns {string} - The full IPFS URL
+ */
+export function getIPFSUrl(cid) {
+  // Remove 'ipfs://' prefix if present
+  const cleanCID = cid.replace('ipfs://', '');
+  // Use public IPFS gateway
+  return `https://ipfs.io/ipfs/${cleanCID}`;
+}
+
+/**
+ * Alternative: Mock upload for testing without IPFS node
+ * @param {Object} credentialData - The credential data
+ * @returns {Promise<string>} - A mock CID
+ */
+export async function uploadCredentialMock(credentialData) {
+  // Generate a mock CID for testing
+  const mockCID = 'Qm' + btoa(JSON.stringify(credentialData)).substring(0, 44);
+  console.log('Mock upload - CID:', mockCID);
+  return mockCID;
+}
