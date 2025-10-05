@@ -32,6 +32,7 @@ export default function AdminPage() {
 
   const handleApprove = async (universityAddress) => {
     try {
+      console.log(universityAddress);
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,

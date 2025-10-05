@@ -55,6 +55,7 @@ export default function TestPage() {
       enabled: false,
     },
   });
+  console.log(verificationResult);
 
   // Functions
   const handleAddUniversity = async () => {

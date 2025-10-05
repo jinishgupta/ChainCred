@@ -41,5 +41,5 @@ export const config = createConfig({
 });
 
 // Contract configuration
-export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x080ec10E35F00aA427Bceb40D902A28B8333c63C';
+export const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS || '0x0255AfC26cf2b8Fd343C22e620dC806bF4Baef95';
 export const ADMIN_ADDRESS = import.meta.env.VITE_ADMIN_ADDRESS || '0x8E1ffdbbe8770F4f82dD14915Cd68285516C1c05';

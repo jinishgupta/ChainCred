@@ -1,4 +1,4 @@
-export const CHAINCRED_ABI = [
+export const CHAINCRED_ABI= [
     {
       "inputs": [],
       "stateMutability": "nonpayable",
@@ -182,25 +182,6 @@ export const CHAINCRED_ABI = [
       "anonymous": false,
       "inputs": [
         {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_fromTokenId",
-          "type": "uint256"
-        },
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_toTokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "BatchMetadataUpdate",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
           "indexed": true,
           "internalType": "uint256",
           "name": "tokenId",
@@ -209,31 +190,19 @@ export const CHAINCRED_ABI = [
         {
           "indexed": true,
           "internalType": "address",
-          "name": "student",
+          "name": "studentAddress",
           "type": "address"
         },
         {
           "indexed": true,
           "internalType": "address",
-          "name": "university",
+          "name": "issuer",
           "type": "address"
         },
         {
           "indexed": false,
           "internalType": "string",
-          "name": "degree",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "major",
-          "type": "string"
-        },
-        {
-          "indexed": false,
-          "internalType": "string",
-          "name": "ipfsCID",
+          "name": "tokenURI",
           "type": "string"
         }
       ],
@@ -263,19 +232,6 @@ export const CHAINCRED_ABI = [
         }
       ],
       "name": "CredentialRevoked",
-      "type": "event"
-    },
-    {
-      "anonymous": false,
-      "inputs": [
-        {
-          "indexed": false,
-          "internalType": "uint256",
-          "name": "_tokenId",
-          "type": "uint256"
-        }
-      ],
-      "name": "MetadataUpdate",
       "type": "event"
     },
     {
@@ -515,18 +471,18 @@ export const CHAINCRED_ABI = [
       "inputs": [
         {
           "internalType": "address",
-          "name": "to",
+          "name": "",
           "type": "address"
         },
         {
           "internalType": "uint256",
-          "name": "tokenId",
+          "name": "",
           "type": "uint256"
         }
       ],
       "name": "approve",
       "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "pure",
       "type": "function"
     },
     {
@@ -577,49 +533,9 @@ export const CHAINCRED_ABI = [
           "type": "uint256"
         },
         {
-          "internalType": "string",
-          "name": "studentName",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "studentId",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "university",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "degree",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "major",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "issueDate",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "graduationDate",
-          "type": "string"
-        },
-        {
-          "internalType": "bool",
-          "name": "isRevoked",
-          "type": "bool"
-        },
-        {
-          "internalType": "uint256",
-          "name": "timestamp",
-          "type": "uint256"
+          "internalType": "address",
+          "name": "studentAddress",
+          "type": "address"
         },
         {
           "internalType": "address",
@@ -627,8 +543,13 @@ export const CHAINCRED_ABI = [
           "type": "address"
         },
         {
+          "internalType": "bool",
+          "name": "isRevoked",
+          "type": "bool"
+        },
+        {
           "internalType": "string",
-          "name": "ipfsCID",
+          "name": "tokenURI",
           "type": "string"
         }
       ],
@@ -768,49 +689,9 @@ export const CHAINCRED_ABI = [
               "type": "uint256"
             },
             {
-              "internalType": "string",
-              "name": "studentName",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "studentId",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "university",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "degree",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "major",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "issueDate",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "graduationDate",
-              "type": "string"
-            },
-            {
-              "internalType": "bool",
-              "name": "isRevoked",
-              "type": "bool"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
+              "internalType": "address",
+              "name": "studentAddress",
+              "type": "address"
             },
             {
               "internalType": "address",
@@ -818,8 +699,13 @@ export const CHAINCRED_ABI = [
               "type": "address"
             },
             {
+              "internalType": "bool",
+              "name": "isRevoked",
+              "type": "bool"
+            },
+            {
               "internalType": "string",
-              "name": "ipfsCID",
+              "name": "tokenURI",
               "type": "string"
             }
           ],
@@ -862,49 +748,9 @@ export const CHAINCRED_ABI = [
               "type": "uint256"
             },
             {
-              "internalType": "string",
-              "name": "studentName",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "studentId",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "university",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "degree",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "major",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "issueDate",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "graduationDate",
-              "type": "string"
-            },
-            {
-              "internalType": "bool",
-              "name": "isRevoked",
-              "type": "bool"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
+              "internalType": "address",
+              "name": "studentAddress",
+              "type": "address"
             },
             {
               "internalType": "address",
@@ -912,8 +758,13 @@ export const CHAINCRED_ABI = [
               "type": "address"
             },
             {
+              "internalType": "bool",
+              "name": "isRevoked",
+              "type": "bool"
+            },
+            {
               "internalType": "string",
-              "name": "ipfsCID",
+              "name": "tokenURI",
               "type": "string"
             }
           ],
@@ -1065,66 +916,12 @@ export const CHAINCRED_ABI = [
       "inputs": [
         {
           "internalType": "address",
-          "name": "account",
-          "type": "address"
-        }
-      ],
-      "name": "isUniversity",
-      "outputs": [
-        {
-          "internalType": "bool",
-          "name": "",
-          "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [
-        {
-          "internalType": "address",
           "name": "studentAddress",
           "type": "address"
         },
         {
           "internalType": "string",
-          "name": "studentName",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "studentId",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "university",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "degree",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "major",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "issueDate",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "graduationDate",
-          "type": "string"
-        },
-        {
-          "internalType": "string",
-          "name": "ipfsCID",
+          "name": "tokenURI",
           "type": "string"
         }
       ],
@@ -1330,18 +1127,18 @@ export const CHAINCRED_ABI = [
       "inputs": [
         {
           "internalType": "address",
-          "name": "operator",
+          "name": "",
           "type": "address"
         },
         {
           "internalType": "bool",
-          "name": "approved",
+          "name": "",
           "type": "bool"
         }
       ],
       "name": "setApprovalForAll",
       "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "pure",
       "type": "function"
     },
     {
@@ -1533,49 +1330,9 @@ export const CHAINCRED_ABI = [
               "type": "uint256"
             },
             {
-              "internalType": "string",
-              "name": "studentName",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "studentId",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "university",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "degree",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "major",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "issueDate",
-              "type": "string"
-            },
-            {
-              "internalType": "string",
-              "name": "graduationDate",
-              "type": "string"
-            },
-            {
-              "internalType": "bool",
-              "name": "isRevoked",
-              "type": "bool"
-            },
-            {
-              "internalType": "uint256",
-              "name": "timestamp",
-              "type": "uint256"
+              "internalType": "address",
+              "name": "studentAddress",
+              "type": "address"
             },
             {
               "internalType": "address",
@@ -1583,8 +1340,13 @@ export const CHAINCRED_ABI = [
               "type": "address"
             },
             {
+              "internalType": "bool",
+              "name": "isRevoked",
+              "type": "bool"
+            },
+            {
               "internalType": "string",
-              "name": "ipfsCID",
+              "name": "tokenURI",
               "type": "string"
             }
           ],

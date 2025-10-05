@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { useReadContract } from 'wagmi';
 import { Search, CheckCircle, XCircle, Shield, Copy } from 'lucide-react';
@@ -11,8 +11,10 @@ export default function VerifyPage() {
   const { id } = useParams();
   const [credentialId, setCredentialId] = useState(id || '');
   const [hasSearched, setHasSearched] = useState(false);
+  const [metadata, setMetadata] = useState(null);
+  const [isLoadingMetadata, setIsLoadingMetadata] = useState(false);
 
-  const { data: verificationResult, refetch } = useReadContract({
+  const { data: verificationResult, refetch: refetchVerification } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CHAINCRED_ABI,
     functionName: 'verifyCredential',
@@ -22,6 +24,40 @@ export default function VerifyPage() {
     },
   });
 
+  // Function to fetch metadata from IPFS
+  const fetchMetadataFromIPFS = async (tokenURI) => {
+    try {
+      // Handle both full URLs and partial URLs
+      const url = tokenURI.startsWith('http') ? tokenURI : `https://${tokenURI}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch metadata');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching metadata:', error);
+      return null;
+    }
+  };
+
+  // Fetch metadata when verification result changes
+  useEffect(() => {
+    if (verificationResult && verificationResult[1] && verificationResult[1].tokenURI) {
+      setIsLoadingMetadata(true);
+      
+      const fetchMetadata = async () => {
+        const meta = await fetchMetadataFromIPFS(verificationResult[1].tokenURI);
+        setMetadata(meta);
+        setIsLoadingMetadata(false);
+      };
+      
+      fetchMetadata();
+    } else {
+      setMetadata(null);
+      setIsLoadingMetadata(false);
+    }
+  }, [verificationResult]);
+
   const handleVerify = async (e) => {
     e.preventDefault();
     if (!credentialId) {
@@ -29,7 +65,9 @@ export default function VerifyPage() {
       return;
     }
     setHasSearched(true);
-    await refetch();
+    setMetadata(null); // Reset metadata for new search
+    setIsLoadingMetadata(false);
+    await refetchVerification();
   };
 
   const handleCopy = (text) => {
@@ -101,9 +139,9 @@ export default function VerifyPage() {
                     <div>
                       <span className="text-sm text-slate-600">Credential ID</span>
                       <div className="flex items-center justify-between bg-slate-50 px-3 py-2 rounded border mt-1">
-                        <span className="font-mono font-semibold">#{verificationResult[1].tokenId.toString()}</span>
+                        <span className="font-mono font-semibold">#{verificationResult[1]?.tokenId?.toString() || credentialId}</span>
                         <button
-                          onClick={() => handleCopy(verificationResult[1].tokenId.toString())}
+                          onClick={() => handleCopy(verificationResult[1]?.tokenId?.toString() || credentialId)}
                           className="p-1 hover:bg-slate-200 rounded"
                         >
                           <Copy className="h-4 w-4" />
@@ -119,50 +157,63 @@ export default function VerifyPage() {
                     </div>
                   </div>
 
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-sm text-slate-600">Student Name</span>
-                      <p className="font-semibold text-lg mt-1">{verificationResult[1].studentName}</p>
+                  {isLoadingMetadata ? (
+                    <div className="text-center py-8">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600 mx-auto"></div>
+                      <p className="text-slate-600 mt-2">Loading credential details...</p>
                     </div>
-                    <div>
-                      <span className="text-sm text-slate-600">Student ID</span>
-                      <p className="font-semibold text-lg mt-1">{verificationResult[1].studentId}</p>
-                    </div>
-                  </div>
+                  ) : metadata ? (
+                    <>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-sm text-slate-600">Student Name</span>
+                          <p className="font-semibold text-lg mt-1">{metadata.studentName || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm text-slate-600">Student ID</span>
+                          <p className="font-semibold text-lg mt-1">{metadata.studentId || 'N/A'}</p>
+                        </div>
+                      </div>
 
-                  <div>
-                    <span className="text-sm text-slate-600">University</span>
-                    <p className="font-semibold text-lg mt-1">{verificationResult[1].university}</p>
-                  </div>
+                      <div>
+                        <span className="text-sm text-slate-600">University</span>
+                        <p className="font-semibold text-lg mt-1">{metadata.university || 'N/A'}</p>
+                      </div>
 
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-sm text-slate-600">Degree</span>
-                      <p className="font-semibold text-lg mt-1">{verificationResult[1].degree}</p>
-                    </div>
-                    <div>
-                      <span className="text-sm text-slate-600">Major</span>
-                      <p className="font-semibold text-lg mt-1">{verificationResult[1].major}</p>
-                    </div>
-                  </div>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-sm text-slate-600">Degree</span>
+                          <p className="font-semibold text-lg mt-1">{metadata.degree || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm text-slate-600">Major</span>
+                          <p className="font-semibold text-lg mt-1">{metadata.major || 'N/A'}</p>
+                        </div>
+                      </div>
 
-                  <div className="grid md:grid-cols-2 gap-4">
-                    <div>
-                      <span className="text-sm text-slate-600">Issue Date</span>
-                      <p className="font-semibold mt-1">{verificationResult[1].issueDate}</p>
+                      <div className="grid md:grid-cols-2 gap-4">
+                        <div>
+                          <span className="text-sm text-slate-600">Issue Date</span>
+                          <p className="font-semibold mt-1">{metadata.issueDate || 'N/A'}</p>
+                        </div>
+                        <div>
+                          <span className="text-sm text-slate-600">Graduation Date</span>
+                          <p className="font-semibold mt-1">{metadata.graduationDate || 'N/A'}</p>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-sm text-amber-600 bg-amber-50 p-4 rounded">
+                      ⚠️ {verificationResult[1]?.tokenURI ? 'Metadata could not be loaded from IPFS' : 'Metadata not available (old contract structure)'}
                     </div>
-                    <div>
-                      <span className="text-sm text-slate-600">Graduation Date</span>
-                      <p className="font-semibold mt-1">{verificationResult[1].graduationDate}</p>
-                    </div>
-                  </div>
+                  )}
 
                   <div>
                     <span className="text-sm text-slate-600">Issued By (University Wallet)</span>
                     <div className="flex items-center justify-between bg-slate-50 px-3 py-2 rounded border mt-1">
-                      <span className="font-mono text-sm">{verificationResult[1].issuer}</span>
+                      <span className="font-mono text-sm">{formatAddress(verificationResult[1]?.issuer)}</span>
                       <button
-                        onClick={() => handleCopy(verificationResult[1].issuer)}
+                        onClick={() => handleCopy(verificationResult[1]?.issuer)}
                         className="p-1 hover:bg-slate-200 rounded"
                       >
                         <Copy className="h-4 w-4" />

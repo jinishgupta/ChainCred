@@ -2,17 +2,16 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 /**
- * @title ChainCred
- * @dev Blockchain-based credential verification system for Latin America
+ * @title ChainCredOptimized
+ * @dev Optimized blockchain-based credential verification system
  * @notice This contract manages the issuance, verification, and revocation of educational credentials
  */
-contract ChainCred is ERC721URIStorage, AccessControl {
+contract ChainCred is ERC721, AccessControl {
     bytes32 public constant UNIVERSITY_ROLE = keccak256("UNIVERSITY_ROLE");
-    uint256 private _tokenIdCounter;
+    uint256 private _tokenIdCounter = 1;
     
     enum UniversityStatus { NotRegistered, Pending, Verified, Rejected }
     
@@ -27,87 +26,40 @@ contract ChainCred is ERC721URIStorage, AccessControl {
     
     struct Credential {
         uint256 tokenId;
-        string studentName;
-        string studentId;
-        string university;
-        string degree;
-        string major;
-        string issueDate;
-        string graduationDate;
-        bool isRevoked;
-        uint256 timestamp;
+        address studentAddress;
         address issuer;
-        string ipfsCID;
+        bool isRevoked;
+        string tokenURI;
     }
     
-    // Mapping from token ID to credential data
+    // Core mappings
     mapping(uint256 => Credential) public credentials;
-    
-    // Mapping from student address to their credential token IDs
+    mapping(address => UniversityInfo) public universities;
     mapping(address => uint256[]) public studentCredentials;
-    
-    // Mapping from university address to their issued credential token IDs
     mapping(address => uint256[]) public universityIssuedCredentials;
     
-    // Mapping from university address to their info
-    mapping(address => UniversityInfo) public universities;
-    
-    // Array of addresses for pending universities
+    // Optimized pending universities tracking
+    mapping(address => uint256) private pendingUniversityIndex;
     address[] public pendingUniversities;
     
     // Events
-    event CredentialIssued(
-        uint256 indexed tokenId,
-        address indexed student,
-        address indexed university,
-        string degree,
-        string major,
-        string ipfsCID
-    );
-    
-    event CredentialRevoked(
-        uint256 indexed tokenId,
-        address indexed revokedBy,
-        uint256 timestamp
-    );
-    
-    event UniversityRegistered(
-        address indexed university,
-        string name,
-        uint256 timestamp
-    );
-    
-    event UniversityApproved(
-        address indexed university,
-        address indexed approvedBy,
-        uint256 timestamp
-    );
-    
-    event UniversityRejected(
-        address indexed university,
-        address indexed rejectedBy,
-        uint256 timestamp
-    );
-    
-    event UniversityAdded(
-        address indexed university,
-        string name
-    );
-    
+    event CredentialIssued(uint256 indexed tokenId, address indexed studentAddress, address indexed issuer, string tokenURI);
+    event CredentialRevoked(uint256 indexed tokenId, address indexed revokedBy, uint256 timestamp);
+    event UniversityRegistered(address indexed university, string name, uint256 timestamp);
+    event UniversityApproved(address indexed university, address indexed approvedBy, uint256 timestamp);
+    event UniversityRejected(address indexed university, address indexed rejectedBy, uint256 timestamp);
+    event UniversityAdded(address indexed university,string name);
+
     constructor() ERC721("ChainCred Credential", "CRED") {
         _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
     }
     
-    /**
-     * @dev Register a university for verification
-     * @param name Name of the university
-     * @param country Country where the university is located
-     * @param registrationNumber Official registration number
-     */
+    // ---------- UNIVERSITY MANAGEMENT ----------
+    
     function registerUniversity(
-        string memory name,
-        string memory country,
-        string memory registrationNumber
+        string calldata name,
+        string calldata country,
+        string calldata registrationNumber
     ) external {
         require(universities[msg.sender].status == UniversityStatus.NotRegistered, "Already registered");
         require(bytes(name).length > 0, "Name required");
@@ -123,15 +75,13 @@ contract ChainCred is ERC721URIStorage, AccessControl {
             registrationTimestamp: block.timestamp
         });
         
+        // Optimized pending university tracking
+        pendingUniversityIndex[msg.sender] = pendingUniversities.length;
         pendingUniversities.push(msg.sender);
         
         emit UniversityRegistered(msg.sender, name, block.timestamp);
     }
     
-    /**
-     * @dev Approve a pending university
-     * @param universityAddress Address of the university to approve
-     */
     function approveUniversity(address universityAddress) external onlyRole(DEFAULT_ADMIN_ROLE) {
         require(universities[universityAddress].status == UniversityStatus.Pending, "Not pending");
         
@@ -141,7 +91,7 @@ contract ChainCred is ERC721URIStorage, AccessControl {
         _removePendingUniversity(universityAddress);
         
         emit UniversityApproved(universityAddress, msg.sender, block.timestamp);
-    }
+    } 
     
     /**
      * @dev Reject a pending university
@@ -151,23 +101,24 @@ contract ChainCred is ERC721URIStorage, AccessControl {
         require(universities[universityAddress].status == UniversityStatus.Pending, "Not pending");
         
         universities[universityAddress].status = UniversityStatus.Rejected;
-        
         _removePendingUniversity(universityAddress);
         
         emit UniversityRejected(universityAddress, msg.sender, block.timestamp);
     }
     
-    /**
-     * @dev Internal function to remove university from pending list
-     */
+    // Optimized O(1) removal
     function _removePendingUniversity(address universityAddress) private {
-        for (uint256 i = 0; i < pendingUniversities.length; i++) {
-            if (pendingUniversities[i] == universityAddress) {
-                pendingUniversities[i] = pendingUniversities[pendingUniversities.length - 1];
-                pendingUniversities.pop();
-                break;
-            }
+        uint256 index = pendingUniversityIndex[universityAddress];
+        uint256 lastIndex = pendingUniversities.length - 1;
+        
+        if (index != lastIndex) {
+            address lastUniversity = pendingUniversities[lastIndex];
+            pendingUniversities[index] = lastUniversity;
+            pendingUniversityIndex[lastUniversity] = index;
         }
+        
+        pendingUniversities.pop();
+        delete pendingUniversityIndex[universityAddress];
     }
     
     /**
@@ -179,74 +130,39 @@ contract ChainCred is ERC721URIStorage, AccessControl {
         _grantRole(UNIVERSITY_ROLE, universityAddress);
         emit UniversityAdded(universityAddress, "University");
     }
+
+    // ---------- CREDENTIAL MANAGEMENT ----------
     
-    /**
-     * @dev Issue a new credential to a student
-     * @param studentAddress Address of the student receiving the credential
-     * @param studentName Full name of the student
-     * @param studentId Student identification number
-     * @param university Name of the university
-     * @param degree Type of degree (Bachelor's, Master's, etc.)
-     * @param major Field of study
-     * @param issueDate Date the credential is issued
-     * @param graduationDate Date the student graduated
-     * @param ipfsCID IPFS CID containing the credential metadata
-     * @return tokenId The ID of the newly minted credential
-     */
     function issueCredential(
         address studentAddress,
-        string memory studentName,
-        string memory studentId,
-        string memory university,
-        string memory degree,
-        string memory major,
-        string memory issueDate,
-        string memory graduationDate,
-        string memory ipfsCID
+        string calldata tokenURI
     ) external onlyRole(UNIVERSITY_ROLE) returns (uint256) {
         require(universities[msg.sender].status == UniversityStatus.Verified, "University not verified");
         require(studentAddress != address(0), "Invalid student address");
-        require(bytes(studentName).length > 0, "Student name required");
-        require(bytes(studentId).length > 0, "Student ID required");
-        require(bytes(degree).length > 0, "Degree required");
-        require(bytes(major).length > 0, "Major required");
-        require(bytes(ipfsCID).length > 0, "IPFS CID required");
+        require(bytes(tokenURI).length > 0, "IPFS CID required");
         
-        uint256 tokenId = _tokenIdCounter;
-        _tokenIdCounter++;
+        uint256 tokenId = _tokenIdCounter++;
         
         _safeMint(studentAddress, tokenId);
-        _setTokenURI(tokenId, string(abi.encodePacked("ipfs://", ipfsCID)));
         
         credentials[tokenId] = Credential({
             tokenId: tokenId,
-            studentName: studentName,
-            studentId: studentId,
-            university: university,
-            degree: degree,
-            major: major,
-            issueDate: issueDate,
-            graduationDate: graduationDate,
-            isRevoked: false,
-            timestamp: block.timestamp,
+            studentAddress: studentAddress,
             issuer: msg.sender,
-            ipfsCID: ipfsCID
+            isRevoked: false,
+            tokenURI: tokenURI
         });
         
         studentCredentials[studentAddress].push(tokenId);
         universityIssuedCredentials[msg.sender].push(tokenId);
         
-        emit CredentialIssued(tokenId, studentAddress, msg.sender, degree, major, ipfsCID);
+        emit CredentialIssued(tokenId, studentAddress, msg.sender, tokenURI);
         
         return tokenId;
     }
     
-    /**
-     * @dev Revoke a credential
-     * @param tokenId The ID of the credential to revoke
-     */
     function revokeCredential(uint256 tokenId) external onlyRole(UNIVERSITY_ROLE) {
-        require(_exists(tokenId), "Credential does not exist");
+        require(_ownerOf(tokenId) != address(0), "Credential does not exist");
         require(credentials[tokenId].issuer == msg.sender, "Only issuer can revoke");
         require(!credentials[tokenId].isRevoked, "Already revoked");
         
@@ -255,14 +171,8 @@ contract ChainCred is ERC721URIStorage, AccessControl {
         emit CredentialRevoked(tokenId, msg.sender, block.timestamp);
     }
     
-    /**
-     * @dev Verify a credential
-     * @param tokenId The ID of the credential to verify
-     * @return isValid Whether the credential is valid (exists and not revoked)
-     * @return credential The credential data
-     */
     function verifyCredential(uint256 tokenId) external view returns (bool isValid, Credential memory credential) {
-        if (!_exists(tokenId)) {
+        if (_ownerOf(tokenId) == address(0)) {
             return (false, credential);
         }
         
@@ -272,11 +182,35 @@ contract ChainCred is ERC721URIStorage, AccessControl {
         return (isValid, credential);
     }
     
-    /**
-     * @dev Get all credentials for a student
-     * @param studentAddress Address of the student
-     * @return Array of credential data
-     */
+    // ---------- SOULBOUND IMPLEMENTATION ----------
+    
+    function _update(
+        address to,
+        uint256 tokenId,
+        address auth
+    ) internal override returns (address) {
+        address from = _ownerOf(tokenId);
+        
+        // Allow minting (from == 0) and burning (to == 0)
+        if (from != address(0) && to != address(0)) {
+            revert("Soulbound: Non-transferable token");
+        }
+        
+        return super._update(to, tokenId, auth);
+    }
+
+    function approve(address, uint256) public pure override {
+        revert("Soulbound: Approval not allowed");
+    }
+
+    function setApprovalForAll(address, bool) public pure override {
+        revert("Soulbound: Approval not allowed");
+    }
+
+    // Transfer functions are handled by _update override above
+        
+    // ---------- VIEW FUNCTIONS ----------
+    
     function getStudentCredentials(address studentAddress) external view returns (Credential[] memory) {
         uint256[] memory tokenIds = studentCredentials[studentAddress];
         Credential[] memory result = new Credential[](tokenIds.length);
@@ -288,11 +222,6 @@ contract ChainCred is ERC721URIStorage, AccessControl {
         return result;
     }
     
-    /**
-     * @dev Get all credentials issued by a university
-     * @param universityAddress Address of the university
-     * @return Array of credential data
-     */
     function getUniversityCredentials(address universityAddress) external view returns (Credential[] memory) {
         uint256[] memory tokenIds = universityIssuedCredentials[universityAddress];
         Credential[] memory result = new Credential[](tokenIds.length);
@@ -304,63 +233,22 @@ contract ChainCred is ERC721URIStorage, AccessControl {
         return result;
     }
     
-    /**
-     * @dev Get the owner of a credential
-     * @param tokenId The ID of the credential
-     * @return Address of the credential owner
-     */
-    function getCredentialOwner(uint256 tokenId) external view returns (address) {
-        require(_exists(tokenId), "Credential does not exist");
-        return ownerOf(tokenId);
-    }
-    
-    /**
-     * @dev Get total number of credentials issued
-     * @return Total count
-     */
     function getTotalCredentials() external view returns (uint256) {
-        return _tokenIdCounter;
+        return _tokenIdCounter - 1;
     }
     
-    /**
-     * @dev Check if an address is a university
-     * @param account Address to check
-     * @return True if the address has university role
-     */
-    function isUniversity(address account) external view returns (bool) {
-        return hasRole(UNIVERSITY_ROLE, account);
-    }
-    
-    /**
-     * @dev Get university information
-     * @param universityAddress Address of the university
-     * @return University information struct
-     */
     function getUniversityInfo(address universityAddress) external view returns (UniversityInfo memory) {
         return universities[universityAddress];
     }
     
-    /**
-     * @dev Get university status
-     * @param universityAddress Address of the university
-     * @return Status of the university
-     */
     function getUniversityStatus(address universityAddress) external view returns (UniversityStatus) {
         return universities[universityAddress].status;
     }
     
-    /**
-     * @dev Get all pending universities
-     * @return Array of pending university addresses
-     */
     function getPendingUniversities() external view returns (address[] memory) {
         return pendingUniversities;
     }
     
-    /**
-     * @dev Get pending universities with their information
-     * @return Array of UniversityInfo structs for pending universities
-     */
     function getPendingUniversitiesInfo() external view returns (UniversityInfo[] memory) {
         UniversityInfo[] memory result = new UniversityInfo[](pendingUniversities.length);
         for (uint256 i = 0; i < pendingUniversities.length; i++) {
@@ -369,17 +257,18 @@ contract ChainCred is ERC721URIStorage, AccessControl {
         return result;
     }
     
+    function getCredentialOwner(uint256 tokenId) external view returns (address) {
+        require(_ownerOf(tokenId) != address(0), "Credential does not exist");
+        return ownerOf(tokenId);
+    }
+    
     // Override required functions
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721URIStorage, AccessControl)
+        override(ERC721, AccessControl)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);
-    }
-    
-    function _exists(uint256 tokenId) internal view returns (bool) {
-        return _ownerOf(tokenId) != address(0);
     }
 }

@@ -5,7 +5,7 @@ import { University, Plus, List, Loader2, AlertCircle, CheckCircle, Clock } from
 import { CONTRACT_ADDRESS } from '../config/wagmi';
 import { CHAINCRED_ABI } from '../config/abi';
 import { formatAddress, formatDate, DEGREE_TYPES, MAJOR_FIELDS } from '../utils/helpers';
-import { uploadCredentialToIPFS } from '../utils/ipfs';
+import { uploadMetadataToIPFS } from '../utils/ipfs';
 
 export default function UniversityPage() {
   const { address, isConnected } = useAccount();
@@ -43,13 +43,6 @@ export default function UniversityPage() {
     address: CONTRACT_ADDRESS,
     abi: CHAINCRED_ABI,
     functionName: 'getUniversityStatus',
-    args: [address],
-  });
-  
-  const { data: isUniversity } = useReadContract({
-    address: CONTRACT_ADDRESS,
-    abi: CHAINCRED_ABI,
-    functionName: 'isUniversity',
     args: [address],
   });
 
@@ -90,7 +83,7 @@ export default function UniversityPage() {
       toast.error('Please fill all required fields');
       return;
     }
-
+ 
     try {
       await writeContract({
         address: CONTRACT_ADDRESS,
@@ -120,8 +113,9 @@ export default function UniversityPage() {
       // Upload credential metadata to IPFS
       setIsUploadingToIPFS(true);
       toast.info('Uploading credential metadata to IPFS...');
-      
-      const ipfsCID = await uploadCredentialToIPFS({
+      console.log("uploading to ipfs")
+      console.log(formData);
+      const result = await uploadMetadataToIPFS({
         studentAddress: formData.studentAddress,
         studentName: formData.studentName,
         studentId: formData.studentId,
@@ -131,10 +125,10 @@ export default function UniversityPage() {
         issueDate: formData.issueDate,
         graduationDate: formData.graduationDate,
       });
-      
+      console.log(result);
       setIsUploadingToIPFS(false);
       toast.success('Metadata uploaded to IPFS!');
-      
+      const tokenURI = result.metadataUrl;
       // Now mint the credential with IPFS CID
       await writeContract({
         address: CONTRACT_ADDRESS,
@@ -142,18 +136,12 @@ export default function UniversityPage() {
         functionName: 'issueCredential',
         args: [
           formData.studentAddress,
-          formData.studentName,
-          formData.studentId,
-          formData.university,
-          formData.degree,
-          formData.major,
-          formData.issueDate,
-          formData.graduationDate,
-          ipfsCID,
+          tokenURI,
         ],
       });
       toast.success('Credential issuance initiated!');
     } catch (error) {
+      console.log(error.message);
       setIsUploadingToIPFS(false);
       toast.error(error.message || 'Failed to issue credential');
     }
@@ -316,17 +304,7 @@ export default function UniversityPage() {
   }
   
   // Status 2 = Verified - show the full university portal
-  if (!isUniversity) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="card max-w-md w-full text-center">
-          <Loader2 className="h-16 w-16 text-primary-600 mx-auto mb-4 animate-spin" />
-          <h2 className="text-2xl font-bold mb-2">Loading...</h2>
-          <p className="text-slate-600">Verifying university status...</p>
-        </div>
-      </div>
-    );
-  }
+  // No additional check needed since status is already verified
 
   return (
     <div className="min-h-screen py-12 px-4">
@@ -503,7 +481,7 @@ export default function UniversityPage() {
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
                         <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="text-xl font-semibold">{cred.studentName}</h3>
+                          <h3 className="text-xl font-semibold">Credential #{index + 1}</h3>
                           {cred.isRevoked ? (
                             <span className="badge-danger">Revoked</span>
                           ) : (
@@ -511,21 +489,14 @@ export default function UniversityPage() {
                           )}
                         </div>
                         <div className="grid md:grid-cols-2 gap-2 text-sm">
-                          <p><span className="font-medium">ID:</span> {cred.tokenId.toString()}</p>
-                          <p><span className="font-medium">Student ID:</span> {cred.studentId}</p>
-                          <p><span className="font-medium">Degree:</span> {cred.degree}</p>
-                          <p><span className="font-medium">Major:</span> {cred.major}</p>
-                          <p><span className="font-medium">Issued:</span> {cred.issueDate}</p>
-                          <p><span className="font-medium">Graduated:</span> {cred.graduationDate}</p>
+                          <p><span className="font-medium">Student:</span> {formatAddress(cred.studentAddress)}</p>
+                          <p><span className="font-medium">Issuer:</span> {formatAddress(cred.issuer)}</p>
                         </div>
                       </div>
                       {!cred.isRevoked && (
-                        <button
-                          onClick={() => handleRevoke(cred.tokenId)}
-                          className="ml-4 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 text-sm font-medium"
-                        >
-                          Revoke
-                        </button>
+                        <div className="ml-4 px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-sm font-medium">
+                          Revoke (Feature in development)
+                        </div>
                       )}
                     </div>
                   </div>

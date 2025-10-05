@@ -72,8 +72,8 @@ export function truncateText(text, maxLength = 50) {
 
 // Get degree types for dropdown
 export const DEGREE_TYPES = [
+  'Bachelor of Technology',
   'Bachelor of Science',
-  'Bachelor of Arts',
   'Master of Science',
   'Master of Arts',
   'Master of Business Administration',
