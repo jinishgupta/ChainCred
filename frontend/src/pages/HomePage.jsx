@@ -59,27 +59,43 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative py-20 px-4 overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-blue-700 opacity-10"></div>
+      <section className="relative py-32 px-4 overflow-hidden">
+        {/* Animated Background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/10 via-blue-600/10 to-purple-600/10 animate-gradient"></div>
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-primary-400/20 rounded-full blur-3xl animate-float"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl animate-float" style={{animationDelay: '2s'}}></div>
+        </div>
+        
         <div className="max-w-7xl mx-auto relative">
-          <div className="text-center animate-fade-in">
-            <div className="inline-flex items-center space-x-2 bg-primary-100 text-primary-700 px-4 py-2 rounded-full text-sm font-semibold mb-6">
-              <Shield className="h-4 w-4" />
+          <div className="text-center">
+            <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-primary-100 to-blue-100 text-primary-700 px-4 py-2 rounded-full text-sm font-semibold mb-6 animate-bounce-gentle border border-primary-200 shadow-lg">
+              <Shield className="h-4 w-4 animate-pulse" />
               <span>Built on Polkadot Paseo Testnet</span>
             </div>
-            <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6">
+            
+            <h1 className="text-5xl md:text-7xl font-bold text-slate-900 mb-6 animate-fade-in">
               End Credential Fraud in
-              <span className="bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent"> Latin America</span>
+              <br/>
+              <span className="gradient-text-animated"> Latin America</span>
             </h1>
-            <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto">
+            
+            <p className="text-xl text-slate-600 mb-8 max-w-3xl mx-auto animate-fade-in stagger-1 leading-relaxed">
               ChainCred uses blockchain technology to create tamper-proof digital credentials that can be verified instantly by anyone, anywhere.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link to="/university" className="btn-primary text-lg">
-                Issue Credentials
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in stagger-2">
+              <Link to="/university" className="btn-primary text-lg ripple group">
+                <span className="flex items-center space-x-2">
+                  <span>Issue Credentials</span>
+                  <Shield className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+                </span>
               </Link>
-              <Link to="/verify" className="btn-secondary text-lg">
-                Verify Now
+              <Link to="/verify" className="btn-secondary text-lg ripple group">
+                <span className="flex items-center space-x-2">
+                  <span>Verify Now</span>
+                  <CheckCircle className="h-5 w-5 group-hover:scale-125 transition-transform" />
+                </span>
               </Link>
             </div>
           </div>
@@ -87,15 +103,15 @@ export default function HomePage() {
       </section>
 
       {/* Stats Section */}
-      <section className="py-12 bg-white">
+      <section className="py-16 bg-white/50 backdrop-blur-sm border-y border-slate-200/50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
-              <div key={index} className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-primary-600 mb-2">
+              <div key={index} className={`text-center group animate-scale-in stagger-${index + 1}`}>
+                <div className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent mb-2 group-hover:scale-110 transition-transform duration-300">
                   {stat.value}
                 </div>
-                <div className="text-sm text-slate-600">{stat.label}</div>
+                <div className="text-sm text-slate-600 font-medium">{stat.label}</div>
               </div>
             ))}
           </div>
@@ -103,24 +119,25 @@ export default function HomePage() {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 px-4">
+      <section className="py-24 px-4">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-4">Why ChainCred?</h2>
-          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 animate-fade-in">
+            <span className="gradient-text">Why ChainCred?</span>
+          </h2>
+          <p className="text-center text-slate-600 mb-12 max-w-2xl mx-auto text-lg animate-fade-in stagger-1">
             Traditional credential verification is slow, expensive, and vulnerable to fraud. We're changing that.
           </p>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {features.map((feature, index) => (
               <div
                 key={index}
-                className="card text-center animate-slide-up"
-                style={{ animationDelay: `${index * 100}ms` }}
+                className={`card text-center group cursor-pointer animate-scale-in stagger-${index + 1}`}
               >
-                <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 text-primary-600 rounded-full mb-4">
+                <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary-100 to-blue-100 text-primary-600 rounded-2xl mb-4 group-hover:scale-110 group-hover:rotate-6 transition-all duration-300 shadow-lg">
                   <feature.icon className="h-8 w-8" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{feature.title}</h3>
-                <p className="text-slate-600">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-2 group-hover:text-primary-600 transition-colors">{feature.title}</h3>
+                <p className="text-slate-600 leading-relaxed">{feature.description}</p>
               </div>
             ))}
           </div>
@@ -128,26 +145,44 @@ export default function HomePage() {
       </section>
 
       {/* User Types Section */}
-      <section className="py-20 px-4 bg-slate-50">
-        <div className="max-w-7xl mx-auto">
-          <h2 className="text-4xl font-bold text-center mb-12">Choose Your Portal</h2>
+      <section className="py-24 px-4 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 opacity-50"></div>
+        
+        <div className="max-w-7xl mx-auto relative">
+          <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 animate-fade-in">
+            <span className="gradient-text">Choose Your Portal</span>
+          </h2>
+          <p className="text-center text-slate-600 mb-12 animate-fade-in stagger-1">Select your role to get started</p>
+          
           <div className="grid md:grid-cols-3 gap-8">
             {userTypes.map((type, index) => {
               const colorClasses = {
-                blue: 'from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700',
-                green: 'from-green-500 to-green-600 hover:from-green-600 hover:to-green-700',
-                purple: 'from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700',
+                blue: 'from-blue-500 via-blue-600 to-blue-700 hover:from-blue-600 hover:to-blue-800',
+                green: 'from-green-500 via-green-600 to-green-700 hover:from-green-600 hover:to-green-800',
+                purple: 'from-purple-500 via-purple-600 to-purple-700 hover:from-purple-600 hover:to-purple-800',
               };
 
               return (
                 <Link
                   key={index}
                   to={type.link}
-                  className={`card bg-gradient-to-br ${colorClasses[type.color]} text-white transform hover:scale-105 transition-all duration-300`}
+                  className={`card bg-gradient-to-br ${colorClasses[type.color]} text-white transform hover:scale-105 hover:-translate-y-2 transition-all duration-300 group animate-scale-in stagger-${index + 1} relative overflow-hidden`}
                 >
-                  <type.icon className="h-12 w-12 mb-4" />
+                  {/* Shine effect */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                  
+                  <type.icon className="h-12 w-12 mb-4 group-hover:scale-110 group-hover:rotate-12 transition-all duration-300" />
                   <h3 className="text-2xl font-bold mb-2">{type.title}</h3>
-                  <p className="opacity-90">{type.description}</p>
+                  <p className="opacity-90 leading-relaxed">{type.description}</p>
+                  
+                  {/* Arrow indicator */}
+                  <div className="mt-4 flex items-center text-white/80 group-hover:text-white transition-colors">
+                    <span className="text-sm font-medium">Get Started</span>
+                    <svg className="w-4 h-4 ml-2 group-hover:translate-x-2 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
                 </Link>
               );
             })}
@@ -156,16 +191,39 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 px-4">
-        <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold mb-6">Ready to Get Started?</h2>
-          <p className="text-xl text-slate-600 mb-8">
-            Join the revolution in credential verification. No fraud, instant results, complete trust.
-          </p>
-          <Link to="/test" className="btn-primary text-lg inline-flex items-center space-x-2">
-            <span>Try the Demo</span>
-            <Zap className="h-5 w-5" />
-          </Link>
+      <section className="py-24 px-4 relative overflow-hidden">
+        {/* Animated background */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600/10 to-blue-600/10 animate-gradient"></div>
+        
+        <div className="max-w-4xl mx-auto text-center relative">
+          <div className="animate-fade-in">
+            <h2 className="text-4xl md:text-5xl font-bold mb-6">
+              <span className="gradient-text-animated">Ready to Get Started?</span>
+            </h2>
+            <p className="text-xl text-slate-600 mb-8 leading-relaxed">
+              Join the revolution in credential verification. No fraud, instant results, complete trust.
+            </p>
+            <Link to="/test" className="btn-primary text-lg inline-flex items-center space-x-2 ripple group animate-bounce-gentle">
+              <span>Try the Demo</span>
+              <Zap className="h-5 w-5 group-hover:rotate-12 transition-transform" />
+            </Link>
+          </div>
+          
+          {/* Decorative elements */}
+          <div className="mt-12 flex justify-center space-x-8 text-sm text-slate-500 animate-fade-in stagger-3">
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span>Free to try</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span>No credit card</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <CheckCircle className="h-4 w-4 text-green-500" />
+              <span>Instant setup</span>
+            </div>
+          </div>
         </div>
       </section>
     </div>

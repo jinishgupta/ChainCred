@@ -237,13 +237,13 @@ export default function TestPage() {
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="card max-w-md w-full text-center">
-          <AlertTriangle className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Wallet Not Connected</h2>
-          <p className="text-slate-600 mb-6">
+        <div className="card max-w-md w-full text-center animate-scale-in">
+          <AlertTriangle className="h-20 w-20 text-yellow-500 mx-auto mb-6 animate-bounce-gentle" />
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Wallet Not Connected</h2>
+          <p className="text-lg text-slate-600 mb-6">
             Please connect your wallet to test the smart contract functions.
           </p>
-          <p className="text-sm text-slate-500">
+          <p className="text-base text-slate-500">
             Click "Connect Wallet" in the navigation bar above.
           </p>
         </div>
@@ -252,69 +252,69 @@ export default function TestPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-16 px-4">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="text-center mb-12">
-          <div className="inline-flex items-center space-x-2 bg-yellow-100 text-yellow-800 px-4 py-2 rounded-full text-sm font-semibold mb-4">
-            <Shield className="h-4 w-4" />
+        <div className="text-center mb-12 animate-fade-in">
+          <div className="inline-flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-amber-100 text-yellow-800 px-6 py-3 rounded-full text-base font-bold mb-6 shadow-md border-2 border-yellow-300">
+            <Shield className="h-5 w-5" />
             <span>Testing Interface for Judges</span>
           </div>
-          <h1 className="text-4xl font-bold mb-4">Smart Contract Testing</h1>
-          <p className="text-slate-600 max-w-2xl mx-auto">
+          <h1 className="text-5xl md:text-6xl font-bold mb-5 gradient-text">Smart Contract Testing</h1>
+          <p className="text-lg md:text-xl text-slate-600 max-w-2xl mx-auto leading-relaxed">
             This page allows you to interact directly with the ChainCred smart contract deployed on Paseo Testnet.
           </p>
         </div>
 
         {/* Contract Info Card */}
-        <div className="card mb-8 bg-gradient-to-br from-primary-50 to-blue-50 border-2 border-primary-200">
-          <h3 className="text-lg font-semibold mb-4 flex items-center">
-            <Shield className="h-5 w-5 mr-2 text-primary-600" />
+        <div className="card mb-10 bg-gradient-to-br from-primary-50 to-blue-50 border-2 border-primary-300 animate-scale-in shadow-lg">
+          <h3 className="text-2xl md:text-3xl font-bold mb-6 flex items-center gradient-text">
+            <Shield className="h-7 w-7 mr-3 text-primary-600" />
             Contract Information
           </h3>
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-5">
             <div>
-              <span className="text-sm text-slate-600">Contract Address:</span>
-              <p className="font-mono text-sm bg-white px-3 py-2 rounded border break-all">
+              <span className="text-base font-semibold text-slate-600 mb-2 block">Contract Address:</span>
+              <p className="font-mono text-sm bg-white px-4 py-3 rounded-xl border-2 border-slate-200 break-all font-semibold">
                 {CONTRACT_ADDRESS}
               </p>
             </div>
             <div>
-              <span className="text-sm text-slate-600">Network:</span>
-              <p className="font-semibold bg-white px-3 py-2 rounded border">Paseo Testnet</p>
+              <span className="text-base font-semibold text-slate-600 mb-2 block">Network:</span>
+              <p className="font-bold text-lg bg-white px-4 py-3 rounded-xl border-2 border-slate-200">Paseo Testnet</p>
             </div>
             <div>
-              <span className="text-sm text-slate-600">Your Address:</span>
-              <p className="font-mono text-sm bg-white px-3 py-2 rounded border break-all">
+              <span className="text-base font-semibold text-slate-600 mb-2 block">Your Address:</span>
+              <p className="font-mono text-sm bg-white px-4 py-3 rounded-xl border-2 border-slate-200 break-all font-semibold">
                 {address}
               </p>
             </div>
             <div>
-              <span className="text-sm text-slate-600">Total Credentials Issued:</span>
-              <p className="font-semibold bg-white px-3 py-2 rounded border">
+              <span className="text-base font-semibold text-slate-600 mb-2 block">Total Credentials Issued:</span>
+              <p className="font-bold text-2xl bg-white px-4 py-3 rounded-xl border-2 border-slate-200">
                 {totalCredentials?.toString() || '0'}
               </p>
             </div>
           </div>
           {isUniversity && (
-            <div className="mt-4 px-4 py-2 bg-green-100 text-green-800 rounded-lg inline-flex items-center">
-              <CheckCircle className="h-4 w-4 mr-2" />
+            <div className="mt-6 px-6 py-3 bg-gradient-to-r from-green-100 to-emerald-100 text-green-800 rounded-xl inline-flex items-center font-bold text-base border-2 border-green-300 shadow-md">
+              <CheckCircle className="h-5 w-5 mr-2" />
               You have University privileges
             </div>
           )}
         </div>
 
         {/* Tabs */}
-        <div className="card">
-          <div className="flex flex-wrap gap-2 mb-6 border-b pb-4">
+        <div className="card animate-scale-in">
+          <div className="flex flex-wrap gap-3 mb-8 border-b-2 pb-6">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`px-4 py-2 rounded-lg font-medium transition-all ${
+                className={`px-6 py-3 rounded-xl font-bold text-base transition-all transform hover:scale-105 ${
                   activeTab === tab.id
-                    ? 'bg-primary-600 text-white shadow-md'
-                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                    ? 'bg-gradient-to-r from-primary-600 to-blue-600 text-white shadow-lg'
+                    : 'bg-slate-100 text-slate-700 hover:bg-slate-200 shadow-md'
                 }`}
               >
                 {tab.label}
@@ -325,43 +325,43 @@ export default function TestPage() {
           {/* Tab Content */}
           <div className="mt-6">
             {activeTab === 'info' && (
-              <div className="space-y-4">
-                <h3 className="text-xl font-semibold mb-4">How to Test</h3>
-                <div className="space-y-3">
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold">
+              <div className="space-y-6">
+                <h3 className="text-2xl md:text-3xl font-bold mb-6 gradient-text">How to Test</h3>
+                <div className="space-y-5">
+                  <div className="flex items-start space-x-4 bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl transition-all hover:shadow-md">
+                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary-600 to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
                       1
                     </div>
                     <div>
-                      <h4 className="font-semibold">Add University (Admin Only)</h4>
-                      <p className="text-sm text-slate-600">Grant university role to an address to issue credentials</p>
+                      <h4 className="font-bold text-lg mb-1">Add University (Admin Only)</h4>
+                      <p className="text-base text-slate-600">Grant university role to an address to issue credentials</p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold">
+                  <div className="flex items-start space-x-4 bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl transition-all hover:shadow-md">
+                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary-600 to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
                       2
                     </div>
                     <div>
-                      <h4 className="font-semibold">Issue Credential (University Only)</h4>
-                      <p className="text-sm text-slate-600">Create a new credential NFT for a student</p>
+                      <h4 className="font-bold text-lg mb-1">Issue Credential (University Only)</h4>
+                      <p className="text-base text-slate-600">Create a new credential NFT for a student</p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold">
+                  <div className="flex items-start space-x-4 bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl transition-all hover:shadow-md">
+                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary-600 to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
                       3
                     </div>
                     <div>
-                      <h4 className="font-semibold">Verify Credential (Anyone)</h4>
-                      <p className="text-sm text-slate-600">Check if a credential is valid and view its details</p>
+                      <h4 className="font-bold text-lg mb-1">Verify Credential (Anyone)</h4>
+                      <p className="text-base text-slate-600">Check if a credential is valid and view its details</p>
                     </div>
                   </div>
-                  <div className="flex items-start space-x-3">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary-100 text-primary-600 rounded-full flex items-center justify-center font-bold">
+                  <div className="flex items-start space-x-4 bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl transition-all hover:shadow-md">
+                    <div className="flex-shrink-0 w-10 h-10 bg-gradient-to-br from-primary-600 to-blue-600 text-white rounded-full flex items-center justify-center font-bold text-lg shadow-lg">
                       4
                     </div>
                     <div>
-                      <h4 className="font-semibold">Revoke Credential (Issuer Only)</h4>
-                      <p className="text-sm text-slate-600">Invalidate a credential that was issued</p>
+                      <h4 className="font-bold text-lg mb-1">Revoke Credential (Issuer Only)</h4>
+                      <p className="text-base text-slate-600">Invalidate a credential that was issued</p>
                     </div>
                   </div>
                 </div>
@@ -371,35 +371,35 @@ export default function TestPage() {
             {activeTab === 'network' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold mb-4">Network & Wallet Debug</h3>
-                  <p className="text-sm text-slate-600 mb-6">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-4 gradient-text">Network & Wallet Debug</h3>
+                  <p className="text-base text-slate-600 mb-6">
                     This section helps debug network connection issues and wallet compatibility.
                   </p>
                 </div>
                 
                 <div className="space-y-6">
                   <div>
-                    <h4 className="text-lg font-semibold mb-3">Wallet Connection</h4>
+                    <h4 className="text-xl font-bold mb-4">Wallet Connection</h4>
                     <ConnectWallet />
                   </div>
                   
                   <div>
-                    <h4 className="text-lg font-semibold mb-3">Network Information</h4>
+                    <h4 className="text-xl font-bold mb-4">Network Information</h4>
                     <NetworkInfo />
                   </div>
                   
-                  <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                    <h4 className="text-lg font-semibold mb-2 text-blue-800">Troubleshooting</h4>
-                    <div className="text-sm text-blue-700 space-y-2">
-                      <p>• If you see "Wrong Network", add Polkadot Hub TestNet to your wallet manually:</p>
-                      <div className="bg-white p-3 rounded border font-mono text-xs">
+                  <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-xl p-6">
+                    <h4 className="text-xl font-bold mb-4 text-blue-900">Troubleshooting</h4>
+                    <div className="text-base text-blue-800 space-y-3 leading-relaxed">
+                      <p className="font-medium">• If you see "Wrong Network", add Polkadot Hub TestNet to your wallet manually:</p>
+                      <div className="bg-white p-4 rounded-lg border-2 border-blue-200 font-mono text-sm">
                         Network Name: Polkadot Hub TestNet<br/>
                         RPC URL: https://testnet-passet-hub-eth-rpc.polkadot.io<br/>
                         Chain ID: 420420422<br/>
                         Currency Symbol: PAS
                       </div>
-                      <p>• If transactions fail, ensure you have PAS tokens from the faucet</p>
-                      <p>• If MetaMask shows Sepolia, manually switch to Polkadot Hub TestNet</p>
+                      <p className="font-medium">• If transactions fail, ensure you have PAS tokens from the faucet</p>
+                      <p className="font-medium">• If MetaMask shows Sepolia, manually switch to Polkadot Hub TestNet</p>
                     </div>
                   </div>
                 </div>
@@ -409,33 +409,33 @@ export default function TestPage() {
             {activeTab === 'admin' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Add University</h3>
-                  <p className="text-sm text-slate-600 mb-4">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3 gradient-text">Add University</h3>
+                  <p className="text-base text-slate-600 mb-6">
                     Grant university role to an address. Only the contract admin can perform this action.
                   </p>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium mb-2">University Address</label>
+                      <label className="block text-lg font-semibold mb-3">University Address</label>
                       <input
                         type="text"
                         value={universityAddress}
                         onChange={(e) => setUniversityAddress(e.target.value)}
                         placeholder="0x..."
-                        className="input-field"
+                        className="input-field text-base"
                       />
                     </div>
                     <button
                       onClick={handleAddUniversity}
                       disabled={isPending || isConfirming}
-                      className="btn-primary w-full sm:w-auto"
+                      className="btn-primary w-full sm:w-auto text-lg py-4 ripple"
                     >
                       {isPending || isConfirming ? (
                         <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          {isPending ? 'Submitting...' : 'Confirming...'}
+                          <Loader2 className="h-6 w-6 mr-2 animate-spin" />
+                          <span className="font-semibold">{isPending ? 'Submitting...' : 'Confirming...'}</span>
                         </>
                       ) : (
-                        'Add University'
+                        <span className="font-semibold">Add University</span>
                       )}
                     </button>
                   </div>
@@ -446,13 +446,13 @@ export default function TestPage() {
             {activeTab === 'issue' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Issue New Credential</h3>
-                  <p className="text-sm text-slate-600 mb-4">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3 gradient-text">Issue New Credential</h3>
+                  <p className="text-base text-slate-600 mb-6">
                     Create a new credential for a student. Only addresses with university role can perform this action.
                   </p>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-2 gap-5">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Student Address *</label>
+                      <label className="block text-base font-semibold mb-3">Student Address *</label>
                       <input
                         type="text"
                         value={credentialForm.studentAddress}
@@ -462,7 +462,7 @@ export default function TestPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Student Name *</label>
+                      <label className="block text-base font-semibold mb-3">Student Name *</label>
                       <input
                         type="text"
                         value={credentialForm.studentName}
@@ -472,7 +472,7 @@ export default function TestPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Student ID *</label>
+                      <label className="block text-base font-semibold mb-3">Student ID *</label>
                       <input
                         type="text"
                         value={credentialForm.studentId}
@@ -482,7 +482,7 @@ export default function TestPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">University</label>
+                      <label className="block text-base font-semibold mb-3">University</label>
                       <input
                         type="text"
                         value={credentialForm.university}
@@ -492,7 +492,7 @@ export default function TestPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Degree *</label>
+                      <label className="block text-base font-semibold mb-3">Degree *</label>
                       <input
                         type="text"
                         value={credentialForm.degree}
@@ -502,7 +502,7 @@ export default function TestPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Major *</label>
+                      <label className="block text-base font-semibold mb-3">Major *</label>
                       <input
                         type="text"
                         value={credentialForm.major}
@@ -512,7 +512,7 @@ export default function TestPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Issue Date</label>
+                      <label className="block text-base font-semibold mb-3">Issue Date</label>
                       <input
                         type="date"
                         value={credentialForm.issueDate}
@@ -521,7 +521,7 @@ export default function TestPage() {
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Graduation Date</label>
+                      <label className="block text-base font-semibold mb-3">Graduation Date</label>
                       <input
                         type="date"
                         value={credentialForm.graduationDate}
@@ -533,15 +533,15 @@ export default function TestPage() {
                   <button
                     onClick={handleIssueCredential}
                     disabled={isPending || isConfirming}
-                    className="btn-primary w-full mt-4"
+                    className="btn-primary w-full mt-6 text-lg py-4 ripple"
                   >
                     {isPending || isConfirming ? (
                       <>
-                        <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                        {isPending ? 'Submitting...' : 'Confirming...'}
+                        <Loader2 className="h-6 w-6 mr-2 animate-spin" />
+                        <span className="font-semibold">{isPending ? 'Submitting...' : 'Confirming...'}</span>
                       </>
                     ) : (
-                      'Issue Credential'
+                      <span className="font-semibold">Issue Credential</span>
                     )}
                   </button>
                 </div>
@@ -551,97 +551,97 @@ export default function TestPage() {
             {activeTab === 'verify' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Verify Credential</h3>
-                  <p className="text-sm text-slate-600 mb-4">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3 gradient-text">Verify Credential</h3>
+                  <p className="text-base text-slate-600 mb-6">
                     Check if a credential exists and is valid. Anyone can verify credentials.
                   </p>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Credential ID</label>
+                      <label className="block text-lg font-semibold mb-3">Credential ID</label>
                       <input
                         type="number"
                         value={verifyTokenId}
                         onChange={(e) => setVerifyTokenId(e.target.value)}
                         placeholder="0"
-                        className="input-field"
+                        className="input-field text-base"
                       />
                     </div>
                     <button
                       onClick={handleVerifyCredential}
-                      className="btn-primary w-full sm:w-auto"
+                      className="btn-primary w-full sm:w-auto text-lg py-4 ripple"
                     >
-                      Verify Credential
+                      <span className="font-semibold">Verify Credential</span>
                     </button>
                   </div>
                   
                   {verificationResult && (
-                    <div className={`mt-6 p-6 rounded-lg border-2 ${verificationResult[0] ? 'bg-green-50 border-green-300' : 'bg-red-50 border-red-300'}`}>
-                      <div className="flex items-center mb-4">
+                    <div className={`mt-8 p-8 rounded-2xl border-2 shadow-lg ${verificationResult[0] ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-300' : 'bg-gradient-to-br from-red-50 to-rose-50 border-red-300'}`}>
+                      <div className="flex items-center mb-6">
                         {verificationResult[0] ? (
                           <>
-                            <CheckCircle className="h-6 w-6 text-green-600 mr-2" />
-                            <h4 className="text-lg font-bold text-green-800">Valid Credential</h4>
+                            <CheckCircle className="h-8 w-8 text-green-600 mr-3" />
+                            <h4 className="text-2xl font-bold text-green-800">Valid Credential</h4>
                           </>
                         ) : (
                           <>
-                            <XCircle className="h-6 w-6 text-red-600 mr-2" />
-                            <h4 className="text-lg font-bold text-red-800">Invalid or Revoked</h4>
+                            <XCircle className="h-8 w-8 text-red-600 mr-3" />
+                            <h4 className="text-2xl font-bold text-red-800">Invalid or Revoked</h4>
                           </>
                         )}
                       </div>
                       
                       {verificationResult[1] && (
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between">
-                            <span className="font-medium">Credential ID:</span>
-                            <span className="font-mono">#{verificationResult[1]?.tokenId?.toString() || verifyTokenId}</span>
+                        <div className="space-y-4 text-base">
+                          <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                            <span className="font-bold">Credential ID:</span>
+                            <span className="font-mono font-semibold">#{verificationResult[1]?.tokenId?.toString() || verifyTokenId}</span>
                           </div>
                           
                           {isLoadingVerifyMetadata ? (
-                            <div className="text-center py-4">
-                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"></div>
-                              <p className="text-slate-600 mt-2 text-xs">Loading credential details...</p>
+                            <div className="text-center py-6">
+                              <div className="animate-spin rounded-full h-10 w-10 border-4 border-primary-600 border-t-transparent mx-auto"></div>
+                              <p className="text-slate-600 mt-3 text-base font-medium">Loading credential details...</p>
                             </div>
                           ) : verifyMetadata ? (
                             <>
-                              <div className="flex justify-between">
-                                <span className="font-medium">Student Name:</span>
-                                <span>{verifyMetadata.studentName || 'N/A'}</span>
+                              <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                                <span className="font-bold">Student Name:</span>
+                                <span className="font-semibold">{verifyMetadata.studentName || 'N/A'}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="font-medium">Student ID:</span>
-                                <span>{verifyMetadata.studentId || 'N/A'}</span>
+                              <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                                <span className="font-bold">Student ID:</span>
+                                <span className="font-semibold">{verifyMetadata.studentId || 'N/A'}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="font-medium">University:</span>
-                                <span>{verifyMetadata.university || 'N/A'}</span>
+                              <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                                <span className="font-bold">University:</span>
+                                <span className="font-semibold">{verifyMetadata.university || 'N/A'}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="font-medium">Degree:</span>
-                                <span>{verifyMetadata.degree || 'N/A'}</span>
+                              <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                                <span className="font-bold">Degree:</span>
+                                <span className="font-semibold">{verifyMetadata.degree || 'N/A'}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="font-medium">Major:</span>
-                                <span>{verifyMetadata.major || 'N/A'}</span>
+                              <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                                <span className="font-bold">Major:</span>
+                                <span className="font-semibold">{verifyMetadata.major || 'N/A'}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="font-medium">Issue Date:</span>
-                                <span>{verifyMetadata.issueDate || 'N/A'}</span>
+                              <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                                <span className="font-bold">Issue Date:</span>
+                                <span className="font-semibold">{verifyMetadata.issueDate || 'N/A'}</span>
                               </div>
-                              <div className="flex justify-between">
-                                <span className="font-medium">Graduation Date:</span>
-                                <span>{verifyMetadata.graduationDate || 'N/A'}</span>
+                              <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                                <span className="font-bold">Graduation Date:</span>
+                                <span className="font-semibold">{verifyMetadata.graduationDate || 'N/A'}</span>
                               </div>
                             </>
                           ) : (
-                            <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                            <div className="text-base text-amber-700 bg-gradient-to-r from-amber-50 to-yellow-50 p-4 rounded-xl border-2 border-amber-200 font-medium">
                               ⚠️ {verificationResult[1]?.tokenURI ? 'Metadata could not be loaded from IPFS' : 'Metadata not available (old contract structure)'}
                             </div>
                           )}
                           
-                          <div className="flex justify-between">
-                            <span className="font-medium">Issuer:</span>
-                            <span className="font-mono">{formatAddress(verificationResult[1]?.issuer)}</span>
+                          <div className="flex justify-between bg-white/60 p-3 rounded-lg">
+                            <span className="font-bold">Issuer:</span>
+                            <span className="font-mono font-semibold">{formatAddress(verificationResult[1]?.issuer)}</span>
                           </div>
                         </div>
                       )}
@@ -654,30 +654,30 @@ export default function TestPage() {
             {activeTab === 'revoke' && (
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Revoke Credential</h3>
-                  <p className="text-sm text-slate-600 mb-4">
+                  <h3 className="text-2xl md:text-3xl font-bold mb-3 gradient-text">Revoke Credential</h3>
+                  <p className="text-base text-slate-600 mb-6">
                     Invalidate a credential. Only the university that issued it can revoke it.
                   </p>
-                  <div className="space-y-4">
+                  <div className="space-y-6">
                     <div>
-                      <label className="block text-sm font-medium mb-2">Credential ID</label>
+                      <label className="block text-lg font-semibold mb-3">Credential ID</label>
                       <input
                         type="number"
                         value={revokeTokenId}
                         onChange={(e) => setRevokeTokenId(e.target.value)}
                         placeholder="0"
-                        className="input-field"
+                        className="input-field text-base"
                       />
                     </div>
                     <button
                       onClick={handleRevokeCredential}
                       disabled={isPending || isConfirming}
-                      className="bg-red-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-700 transition-all duration-200 shadow-md hover:shadow-lg w-full sm:w-auto"
+                      className="bg-gradient-to-r from-red-600 to-rose-600 text-white px-8 py-4 rounded-xl font-bold text-lg hover:from-red-700 hover:to-rose-700 transition-all duration-200 shadow-lg hover:shadow-xl w-full sm:w-auto transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isPending || isConfirming ? (
                         <>
-                          <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                          {isPending ? 'Submitting...' : 'Confirming...'}
+                          <Loader2 className="h-6 w-6 mr-2 animate-spin inline" />
+                          <span>{isPending ? 'Submitting...' : 'Confirming...'}</span>
                         </>
                       ) : (
                         'Revoke Credential'
@@ -692,31 +692,31 @@ export default function TestPage() {
 
         {/* Transaction Status */}
         {(isPending || isConfirming || isSuccess) && (
-          <div className="card mt-6">
-            <h3 className="text-lg font-semibold mb-4">Transaction Status</h3>
-            <div className="space-y-2">
+          <div className="card mt-8 animate-scale-in border-2 border-primary-300 shadow-lg">
+            <h3 className="text-2xl font-bold mb-6 gradient-text">Transaction Status</h3>
+            <div className="space-y-4">
               {isPending && (
-                <div className="flex items-center text-yellow-600">
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  <span>Waiting for user confirmation...</span>
+                <div className="flex items-center text-yellow-600 bg-yellow-50 p-4 rounded-xl border-2 border-yellow-300">
+                  <Loader2 className="h-6 w-6 mr-3 animate-spin" />
+                  <span className="font-bold text-lg">Waiting for user confirmation...</span>
                 </div>
               )}
               {isConfirming && (
-                <div className="flex items-center text-blue-600">
-                  <Loader2 className="h-5 w-5 mr-2 animate-spin" />
-                  <span>Waiting for blockchain confirmation...</span>
+                <div className="flex items-center text-blue-600 bg-blue-50 p-4 rounded-xl border-2 border-blue-300">
+                  <Loader2 className="h-6 w-6 mr-3 animate-spin" />
+                  <span className="font-bold text-lg">Waiting for blockchain confirmation...</span>
                 </div>
               )}
               {isSuccess && (
-                <div className="flex items-center text-green-600">
-                  <CheckCircle className="h-5 w-5 mr-2" />
-                  <span>Transaction confirmed!</span>
+                <div className="flex items-center text-green-600 bg-green-50 p-4 rounded-xl border-2 border-green-300">
+                  <CheckCircle className="h-6 w-6 mr-3" />
+                  <span className="font-bold text-lg">Transaction confirmed!</span>
                 </div>
               )}
               {hash && (
-                <div className="mt-2">
-                  <span className="text-sm text-slate-600">Transaction Hash:</span>
-                  <p className="font-mono text-xs bg-slate-100 px-3 py-2 rounded break-all">
+                <div className="mt-4 bg-gradient-to-br from-slate-50 to-blue-50 p-5 rounded-xl border-2 border-slate-200">
+                  <span className="text-base font-bold text-slate-600 block mb-2">Transaction Hash:</span>
+                  <p className="font-mono text-sm bg-white px-4 py-3 rounded-lg border-2 border-slate-200 break-all font-semibold">
                     {hash}
                   </p>
                 </div>

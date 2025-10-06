@@ -1,5 +1,5 @@
 import { http, createConfig } from 'wagmi';
-import { injected, metaMask, walletConnect } from 'wagmi/connectors';
+import { injected, walletConnect } from 'wagmi/connectors';
 
 // Configure the Polkadot Hub TestNet chain
 export const polkadotHubTestnet = {
@@ -32,23 +32,25 @@ export const polkadotHubTestnet = {
 export const config = createConfig({
   chains: [polkadotHubTestnet],
   connectors: [
-    injected(),
-    metaMask({
-      dappMetadata: {
-        name: 'ChainCred',
-        url: typeof window !== 'undefined' ? window.location.origin : 'https://chaincred-jmiu.onrender.com',
-        iconUrl: typeof window !== 'undefined' ? `${window.location.origin}/favicon.ico` : 'https://chaincred-jmiu.onrender.com/favicon.ico',
-      },
+    injected({
+      shimDisconnect: true,
+      target: 'metaMask',
     }),
     walletConnect({
-      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'your-project-id',
+      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'b57ab6f068620c67a1b07b2c5c0e6bc8',
       metadata: {
         name: 'ChainCred',
-        description: 'Blockchain-based credential verification system',
-        url: typeof window !== 'undefined' ? window.location.origin : 'https://chaincred-jmiu.onrender.com',
-        icons: [typeof window !== 'undefined' ? `${window.location.origin}/favicon.ico` : 'https://chaincred-jmiu.onrender.com/favicon.ico'],
+        description: 'Blockchain-based credential verification system for Latin America',
+        url: typeof window !== 'undefined' ? window.location.origin : 'https://chaincred.app',
+        icons: ['https://avatars.githubusercontent.com/u/37784886'],
       },
       showQrModal: true,
+      qrModalOptions: {
+        themeMode: 'light',
+        themeVariables: {
+          '--wcm-z-index': '9999',
+        },
+      },
     }),
   ],
   transports: {

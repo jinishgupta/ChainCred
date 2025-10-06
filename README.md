@@ -45,6 +45,8 @@ ChainCred provides:
 - **Employer Verification** - Instant credential verification
 - **Admin Dashboard** - Manage university permissions
 - **Mobile Responsive** - Works on all devices
+- **📱 Mobile Wallet Support** - Connect via MetaMask mobile app using WalletConnect
+- **🔗 IPFS Integration** - Decentralized credential metadata storage
 
 ---
 
@@ -55,7 +57,7 @@ ChainCred provides:
 ```bash
 - Node.js v18+ 
 - npm or yarn
-- MetaMask wallet
+- MetaMask wallet (browser extension or mobile app)
 - Paseo testnet tokens
 ```
 
@@ -82,7 +84,6 @@ npm install
 Create `contracts/.env`:
 
 ```bash
-PASEO_RPC_URL=https://rpc.ibp.network/paseo
 PRIVATE_KEY=your_private_key_here
 ```
 
@@ -96,6 +97,8 @@ VITE_ADMIN_ADDRESS=0xYourAdminAddress
 VITE_CHAIN_ID=42161
 VITE_RPC_URL=https://rpc.ibp.network/paseo
 VITE_APP_URL=http://localhost:5173
+
+VITE_WALLETCONNECT_PROJECT_ID=your_project_id_here
 ```
 
 ---

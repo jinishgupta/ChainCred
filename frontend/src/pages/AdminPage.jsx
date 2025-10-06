@@ -110,10 +110,10 @@ export default function AdminPage() {
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="card max-w-md w-full text-center">
-          <AlertCircle className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Wallet Not Connected</h2>
-          <p className="text-slate-600">Please connect your wallet to access the admin portal.</p>
+        <div className="card max-w-md w-full text-center animate-scale-in">
+          <AlertCircle className="h-20 w-20 text-yellow-500 mx-auto mb-6 animate-bounce-gentle" />
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Wallet Not Connected</h2>
+          <p className="text-lg text-slate-600">Please connect your wallet to access the admin portal.</p>
         </div>
       </div>
     );
@@ -122,14 +122,14 @@ export default function AdminPage() {
   if (!isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="card max-w-md w-full text-center">
-          <AlertCircle className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Access Denied</h2>
-          <p className="text-slate-600 mb-4">
+        <div className="card max-w-md w-full text-center animate-scale-in">
+          <AlertCircle className="h-20 w-20 text-red-500 mx-auto mb-6 animate-bounce-gentle" />
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Access Denied</h2>
+          <p className="text-lg text-slate-600 mb-6">
             This address does not have administrator privileges.
           </p>
-          <p className="text-sm text-slate-500">Your address: {formatAddress(address)}</p>
-          <p className="text-sm text-slate-500 mt-2">
+          <p className="text-base text-slate-500">Your address: {formatAddress(address)}</p>
+          <p className="text-base text-slate-500 mt-3">
             Only the contract deployer can access this page.
           </p>
         </div>
@@ -138,85 +138,90 @@ export default function AdminPage() {
   }
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-16 px-4">
       <div className="max-w-6xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <Shield className="h-10 w-10 text-primary-600" />
-            <h1 className="text-4xl font-bold">Admin Portal</h1>
+        <div className="mb-12 animate-fade-in">
+          <div className="flex items-center space-x-4 mb-6">
+            <div className="bg-gradient-to-br from-primary-100 to-blue-100 p-4 rounded-2xl shadow-lg animate-float">
+              <Shield className="h-12 w-12 text-primary-600" />
+            </div>
+            <div>
+              <h1 className="text-5xl md:text-6xl font-bold gradient-text">Admin Portal</h1>
+              <p className="text-lg md:text-xl text-slate-600 mt-2">
+                Manage university registrations and approvals
+              </p>
+            </div>
           </div>
-          <p className="text-slate-600">
-            Manage university registrations and approvals
-          </p>
         </div>
 
-        <div className="card mb-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-2xl font-bold">Pending University Registrations</h2>
+        <div className="card mb-8 animate-scale-in">
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl md:text-4xl font-bold gradient-text">Pending University Registrations</h2>
             <button
               onClick={() => refetch()}
-              className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+              className="text-base text-primary-600 hover:text-primary-700 font-bold transition-all transform hover:scale-105 px-4 py-2 rounded-lg hover:bg-primary-50"
             >
               Refresh
             </button>
           </div>
 
           {!pendingUniversities || pendingUniversities.length === 0 ? (
-            <div className="text-center py-12">
-              <Clock className="h-16 w-16 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-600">No pending university registrations</p>
-              <p className="text-sm text-slate-500 mt-2">
+            <div className="text-center py-16">
+              <Clock className="h-20 w-20 text-slate-300 mx-auto mb-6" />
+              <p className="text-xl text-slate-600 font-semibold">No pending university registrations</p>
+              <p className="text-base text-slate-500 mt-3">
                 New registrations will appear here for approval
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {pendingUniversities.map((university, index) => (
                 <div
                   key={index}
-                  className="border border-slate-200 rounded-lg p-6 hover:border-primary-300 transition-colors"
+                  className="border-2 border-slate-200 rounded-2xl p-8 hover:border-primary-400 transition-all hover:shadow-lg animate-scale-in"
+                  style={{animationDelay: `${index * 0.1}s`}}
                 >
                   <div className="flex justify-between items-start">
                     <div className="flex-1">
-                      <div className="flex items-center space-x-2 mb-3">
-                        <h3 className="text-xl font-semibold">{university.name}</h3>
-                        <span className="badge-warning">Pending</span>
+                      <div className="flex items-center space-x-3 mb-5">
+                        <h3 className="text-2xl md:text-3xl font-bold text-slate-900">{university.name}</h3>
+                        <span className="badge-warning text-base px-4 py-2">Pending</span>
                       </div>
                       
-                      <div className="grid md:grid-cols-2 gap-3 text-sm">
-                        <div>
-                          <p className="text-slate-500">Country</p>
-                          <p className="font-medium">{university.country}</p>
+                      <div className="grid md:grid-cols-2 gap-5 text-base">
+                        <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-4 rounded-xl">
+                          <p className="text-slate-600 font-semibold mb-1">Country</p>
+                          <p className="font-bold text-lg text-slate-900">{university.country}</p>
                         </div>
-                        <div>
-                          <p className="text-slate-500">Registration Number</p>
-                          <p className="font-medium">{university.registrationNumber}</p>
+                        <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-4 rounded-xl">
+                          <p className="text-slate-600 font-semibold mb-1">Registration Number</p>
+                          <p className="font-bold text-lg text-slate-900">{university.registrationNumber}</p>
                         </div>
-                        <div>
-                          <p className="text-slate-500">Wallet Address</p>
-                          <p className="font-medium font-mono text-xs">
+                        <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-4 rounded-xl">
+                          <p className="text-slate-600 font-semibold mb-1">Wallet Address</p>
+                          <p className="font-mono text-base font-semibold text-slate-900">
                             {formatAddress(university.universityAddress)}
                           </p>
                         </div>
-                        <div>
-                          <p className="text-slate-500">Submitted</p>
-                          <p className="font-medium">
+                        <div className="bg-gradient-to-br from-slate-50 to-blue-50 p-4 rounded-xl">
+                          <p className="text-slate-600 font-semibold mb-1">Submitted</p>
+                          <p className="font-bold text-lg text-slate-900">
                             {new Date(Number(university.registrationTimestamp) * 1000).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
                     </div>
 
-                    <div className="flex flex-col space-y-2 ml-4">
+                    <div className="flex flex-col space-y-3 ml-6">
                       <button
                         onClick={() => handleApprove(university.universityAddress)}
                         disabled={isPending || isConfirming}
-                        className="flex items-center space-x-2 px-4 py-2 bg-green-100 text-green-700 rounded-lg hover:bg-green-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 rounded-xl hover:from-green-200 hover:to-emerald-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-base transition-all transform hover:scale-105 shadow-md hover:shadow-lg border-2 border-green-300"
                       >
                         {isPending || isConfirming ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-5 w-5 animate-spin" />
                         ) : (
-                          <CheckCircle className="h-4 w-4" />
+                          <CheckCircle className="h-5 w-5" />
                         )}
                         <span>Approve</span>
                       </button>
@@ -224,12 +229,12 @@ export default function AdminPage() {
                       <button
                         onClick={() => handleReject(university.universityAddress)}
                         disabled={isPending || isConfirming}
-                        className="flex items-center space-x-2 px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium"
+                        className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-red-100 to-rose-100 text-red-700 rounded-xl hover:from-red-200 hover:to-rose-200 disabled:opacity-50 disabled:cursor-not-allowed font-bold text-base transition-all transform hover:scale-105 shadow-md hover:shadow-lg border-2 border-red-300"
                       >
                         {isPending || isConfirming ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-5 w-5 animate-spin" />
                         ) : (
-                          <XCircle className="h-4 w-4" />
+                          <XCircle className="h-5 w-5" />
                         )}
                         <span>Reject</span>
                       </button>
@@ -241,13 +246,13 @@ export default function AdminPage() {
           )}
         </div>
 
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-          <h3 className="font-semibold text-blue-900 mb-2">Admin Responsibilities</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Review university registration details carefully</li>
-            <li>• Verify the authenticity of the university and registration number</li>
-            <li>• Approve only legitimate educational institutions</li>
-            <li>• Approved universities will be able to issue verifiable credentials</li>
+        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 border-2 border-blue-300 rounded-2xl p-8 animate-fade-in">
+          <h3 className="text-2xl font-bold text-blue-900 mb-5">Admin Responsibilities</h3>
+          <ul className="text-base text-blue-800 space-y-3 leading-relaxed">
+            <li className="flex items-start"><span className="text-xl mr-3">•</span><span className="font-medium">Review university registration details carefully</span></li>
+            <li className="flex items-start"><span className="text-xl mr-3">•</span><span className="font-medium">Verify the authenticity of the university and registration number</span></li>
+            <li className="flex items-start"><span className="text-xl mr-3">•</span><span className="font-medium">Approve only legitimate educational institutions</span></li>
+            <li className="flex items-start"><span className="text-xl mr-3">•</span><span className="font-medium">Approved universities will be able to issue verifiable credentials</span></li>
           </ul>
         </div>
       </div>

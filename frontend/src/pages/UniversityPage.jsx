@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
 import { toast } from 'sonner';
-import { University, Plus, User2, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { University, Plus, User2, AlertCircle, CheckCircle, Clock, List, Loader2 } from 'lucide-react';
 import { CONTRACT_ADDRESS } from '../config/wagmi';
 import { CHAINCRED_ABI } from '../config/abi';
 import { formatAddress, formatDate, DEGREE_TYPES, MAJOR_FIELDS } from '../utils/helpers';
@@ -221,10 +221,10 @@ export default function UniversityPage() {
   if (!isConnected) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="card max-w-md w-full text-center">
-          <AlertCircle className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Wallet Not Connected</h2>
-          <p className="text-slate-600">Please connect your wallet to access the university portal.</p>
+        <div className="card max-w-md w-full text-center animate-scale-in">
+          <AlertCircle className="h-20 w-20 text-yellow-500 mx-auto mb-6 animate-bounce-gentle" />
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">Wallet Not Connected</h2>
+          <p className="text-lg text-slate-600">Please connect your wallet to access the university portal.</p>
         </div>
       </div>
     );
@@ -236,20 +236,22 @@ export default function UniversityPage() {
   // If university is not registered, show registration form
   if (status === 0) {
     return (
-      <div className="min-h-screen py-12 px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="card">
-            <div className="flex items-center space-x-3 mb-6">
-              <University className="h-10 w-10 text-primary-600" />
+      <div className="min-h-screen py-16 px-4">
+        <div className="max-w-3xl mx-auto">
+          <div className="card animate-scale-in">
+            <div className="flex items-center space-x-4 mb-8">
+              <div className="bg-gradient-to-br from-primary-100 to-blue-100 p-4 rounded-2xl shadow-lg animate-float">
+                <University className="h-12 w-12 text-primary-600" />
+              </div>
               <div>
-                <h1 className="text-3xl font-bold">University Registration</h1>
-                <p className="text-slate-600">Register your university to issue credentials</p>
+                <h1 className="text-4xl md:text-5xl font-bold gradient-text">University Registration</h1>
+                <p className="text-lg md:text-xl text-slate-600 mt-2">Register your university to issue credentials</p>
               </div>
             </div>
             
             <form onSubmit={handleRegistration} className="space-y-6">
               <div>
-                <label className="block text-sm font-medium mb-2">University Name *</label>
+                <label className="block text-lg font-semibold mb-3">University Name *</label>
                 <input
                   type="text"
                   name="name"
@@ -262,7 +264,7 @@ export default function UniversityPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">Country *</label>
+                <label className="block text-lg font-semibold mb-3">Country *</label>
                 <input
                   type="text"
                   name="country"
@@ -275,7 +277,7 @@ export default function UniversityPage() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium mb-2">Registration Number *</label>
+                <label className="block text-lg font-semibold mb-3">Registration Number *</label>
                 <input
                   type="text"
                   name="registrationNumber"
@@ -287,9 +289,9 @@ export default function UniversityPage() {
                 />
               </div>
               
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-sm text-blue-800">
-                  <strong>Note:</strong> After registration, an administrator will review and verify your university. 
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-xl p-6 animate-pulse-gentle">
+                <p className="text-base md:text-lg text-blue-900 leading-relaxed">
+                  <strong className="text-lg">📝 Note:</strong> After registration, an administrator will review and verify your university. 
                   You will be able to issue credentials once approved.
                 </p>
               </div>
@@ -297,15 +299,15 @@ export default function UniversityPage() {
               <button
                 type="submit"
                 disabled={isPending || isConfirming}
-                className="btn-primary w-full"
+                className="btn-primary w-full text-lg py-4 ripple"
               >
                 {isPending || isConfirming ? (
                   <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin inline" />
-                    {isPending ? 'Submitting...' : 'Confirming...'}
+                    <Loader2 className="h-6 w-6 mr-3 animate-spin inline" />
+                    <span className="text-lg font-semibold">{isPending ? 'Submitting...' : 'Confirming...'}</span>
                   </>
                 ) : (
-                  'Register University'
+                  <span className="text-lg font-semibold">Register University</span>
                 )}
               </button>
             </form>
@@ -319,18 +321,18 @@ export default function UniversityPage() {
   if (status === 1) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4">
-        <div className="card max-w-md w-full text-center">
-          <Clock className="h-16 w-16 text-yellow-500 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-2">Pending Verification</h2>
-          <p className="text-slate-600 mb-4">
+        <div className="card max-w-2xl w-full text-center animate-scale-in">
+          <Clock className="h-20 w-20 text-yellow-500 mx-auto mb-6 animate-pulse-gentle" />
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 gradient-text">Pending Verification</h2>
+          <p className="text-lg md:text-xl text-slate-600 mb-6 leading-relaxed">
             Your university registration is pending approval from an administrator.
           </p>
           {universityInfo && (
-            <div className="bg-slate-50 rounded-lg p-4 text-left">
-              <p className="text-sm mb-1"><strong>University:</strong> {universityInfo.name}</p>
-              <p className="text-sm mb-1"><strong>Country:</strong> {universityInfo.country}</p>
-              <p className="text-sm mb-1"><strong>Registration #:</strong> {universityInfo.registrationNumber}</p>
-              <p className="text-sm"><strong>Address:</strong> {formatAddress(address)}</p>
+            <div className="bg-gradient-to-br from-slate-50 to-blue-50 rounded-2xl p-6 text-left border-2 border-slate-200">
+              <p className="text-base md:text-lg mb-3"><strong className="text-primary-600">University:</strong> {universityInfo.name}</p>
+              <p className="text-base md:text-lg mb-3"><strong className="text-primary-600">Country:</strong> {universityInfo.country}</p>
+              <p className="text-base md:text-lg mb-3"><strong className="text-primary-600">Registration #:</strong> {universityInfo.registrationNumber}</p>
+              <p className="text-base md:text-lg"><strong className="text-primary-600">Address:</strong> {formatAddress(address)}</p>
             </div>
           )}
           <p className="text-sm text-slate-500 mt-4">
@@ -364,23 +366,27 @@ export default function UniversityPage() {
   // No additional check needed since status is already verified
 
   return (
-    <div className="min-h-screen py-12 px-4">
+    <div className="min-h-screen py-16 px-4">
       <div className="max-w-7xl mx-auto">
-        <div className="mb-8">
-          <div className="flex items-center space-x-3 mb-4">
-            <University className="h-10 w-10 text-primary-600" />
-            <h1 className="text-4xl font-bold">University Portal</h1>
+        <div className="mb-12 animate-fade-in">
+          <div className="flex items-center space-x-4 mb-6 ml-36">
+            <div className="bg-gradient-to-br from-primary-100 to-blue-100 p-4 rounded-2xl shadow-lg animate-float">
+              <University className="h-12 w-12 text-primary-600" />
+            </div>
+            <div>
+              <h1 className="text-5xl md:text-6xl font-bold gradient-text">University Portal</h1>
+              <p className="text-lg md:text-xl text-slate-600 mt-2">Issue and manage digital credentials on the blockchain</p>
+            </div>
           </div>
-          <p className="text-slate-600">Issue and manage digital credentials on the blockchain</p>
         </div>
 
-        <div className="flex space-x-4 mb-8">
+        <div className="flex flex-wrap gap-3 mb-10 ml-36">
           <button
             onClick={() => setActiveView('issue')}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+            className={`flex items-center space-x-2 px-8 py-4 rounded-xl text-base font-bold transition-all transform hover:scale-105 ${
               activeView === 'issue'
-                ? 'bg-primary-600 text-white shadow-lg'
-                : 'bg-white text-slate-700 hover:bg-slate-100'
+                ? 'bg-gradient-to-r from-primary-600 to-blue-600 text-white shadow-lg'
+                : 'bg-white text-slate-700 hover:bg-slate-100 shadow-md'
             }`}
           >
             <Plus className="h-5 w-5" />
@@ -391,10 +397,10 @@ export default function UniversityPage() {
               setActiveView('list');
               refetch();
             }}
-            className={`flex items-center space-x-2 px-6 py-3 rounded-lg font-semibold transition-all ${
+            className={`flex items-center space-x-2 px-8 py-4 rounded-xl text-base font-bold transition-all transform hover:scale-105 ${
               activeView === 'list'
-                ? 'bg-primary-600 text-white shadow-lg'
-                : 'bg-white text-slate-700 hover:bg-slate-100'
+                ? 'bg-gradient-to-r from-primary-600 to-blue-600 text-white shadow-lg'
+                : 'bg-white text-slate-700 hover:bg-slate-100 shadow-md'
             }`}
           >
             <List className="h-5 w-5" />
@@ -403,12 +409,12 @@ export default function UniversityPage() {
         </div>
 
         {activeView === 'issue' && (
-          <div className="card max-w-4xl">
-            <h2 className="text-2xl font-bold mb-6">Issue New Credential</h2>
+          <div className="card max-w-5xl mx-auto animate-scale-in">
+            <h2 className="text-3xl md:text-4xl font-bold mb-8 gradient-text">Issue New Credential</h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Student Wallet Address *</label>
+                  <label className="block text-base font-semibold mb-3">Student Wallet Address *</label>
                   <input
                     type="text"
                     name="studentAddress"
@@ -420,7 +426,7 @@ export default function UniversityPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Full Name *</label>
+                  <label className="block text-base font-semibold mb-3">Full Name *</label>
                   <input
                     type="text"
                     name="studentName"
@@ -432,7 +438,7 @@ export default function UniversityPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Student ID *</label>
+                  <label className="block text-base font-semibold mb-3">Student ID *</label>
                   <input
                     type="text"
                     name="studentId"
@@ -444,7 +450,7 @@ export default function UniversityPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">University Name</label>
+                  <label className="block text-base font-semibold mb-3">University Name</label>
                   <input
                     type="text"
                     name="university"
@@ -454,7 +460,7 @@ export default function UniversityPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Degree *</label>
+                  <label className="block text-base font-semibold mb-3">Degree *</label>
                   <select
                     name="degree"
                     value={formData.degree}
@@ -469,7 +475,7 @@ export default function UniversityPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Major *</label>
+                  <label className="block text-base font-semibold mb-3">Major *</label>
                   <select
                     name="major"
                     value={formData.major}
@@ -484,7 +490,7 @@ export default function UniversityPage() {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Issue Date</label>
+                  <label className="block text-base font-semibold mb-3">Issue Date</label>
                   <input
                     type="date"
                     name="issueDate"
@@ -494,7 +500,7 @@ export default function UniversityPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-2">Graduation Date</label>
+                  <label className="block text-base font-semibold mb-3">Graduation Date</label>
                   <input
                     type="date"
                     name="graduationDate"
@@ -508,20 +514,20 @@ export default function UniversityPage() {
               <button
                 type="submit"
                 disabled={isPending || isConfirming || isUploadingToIPFS}
-                className="btn-primary w-full"
+                className="btn-primary w-full text-lg py-4 ripple"
               >
                 {isUploadingToIPFS ? (
                   <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin inline" />
-                    Uploading to IPFS...
+                    <Loader2 className="h-6 w-6 mr-3 animate-spin inline" />
+                    <span className="text-lg font-semibold">Uploading to IPFS...</span>
                   </>
                 ) : isPending || isConfirming ? (
                   <>
-                    <Loader2 className="h-5 w-5 mr-2 animate-spin inline" />
-                    {isPending ? 'Submitting...' : 'Confirming...'}
+                    <Loader2 className="h-6 w-6 mr-3 animate-spin inline" />
+                    <span className="text-lg font-semibold">{isPending ? 'Submitting...' : 'Confirming...'}</span>
                   </>
                 ) : (
-                  'Issue Credential'
+                  <span className="text-lg font-semibold">Issue Credential</span>
                 )}
               </button>
             </form>
@@ -529,30 +535,36 @@ export default function UniversityPage() {
         )}
 
         {activeView === 'list' && (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold">Issued Credentials</h2>
+          <div className="space-y-6 animate-fade-in">
+            <h2 className="text-3xl md:text-4xl font-bold gradient-text">Issued Credentials</h2>
             {credentials && credentials.length > 0 ? (
-              <div className="grid gap-4">
+              <div className="grid gap-5">
                 {credentials.map((cred, index) => (
-                  <div key={index} className="card">
+                  <div key={index} className={`card animate-scale-in stagger-${(index % 5) + 1}`}>
                     <div className="flex justify-between items-start">
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <h3 className="text-xl font-semibold">Credential #{index + 1}</h3>
+                        <div className="flex items-center space-x-3 mb-3">
+                          <h3 className="text-xl md:text-2xl font-bold text-slate-900">Credential #{index + 1}</h3>
                           {cred.isRevoked ? (
-                            <span className="badge-danger">Revoked</span>
+                            <span className="badge-danger text-sm px-3 py-1.5">Revoked</span>
                           ) : (
-                            <span className="badge-success">Valid</span>
+                            <span className="badge-success text-sm px-3 py-1.5">Valid</span>
                           )}
                         </div>
-                        <div className="grid md:grid-cols-2 gap-2 text-sm">
-                          <p><span className="font-medium">Student:</span> {formatAddress(cred.studentAddress)}</p>
-                          <p><span className="font-medium">Issuer:</span> {formatAddress(cred.issuer)}</p>
+                        <div className="grid md:grid-cols-2 gap-3 text-base">
+                          <p className="bg-white/50 backdrop-blur-sm p-2.5 rounded-lg">
+                            <span className="font-semibold text-slate-600">Student:</span> 
+                            <span className="ml-2 font-mono text-sm">{formatAddress(cred.studentAddress)}</span>
+                          </p>
+                          <p className="bg-white/50 backdrop-blur-sm p-2.5 rounded-lg">
+                            <span className="font-semibold text-slate-600">Issuer:</span> 
+                            <span className="ml-2 font-mono text-sm">{formatAddress(cred.issuer)}</span>
+                          </p>
                         </div>
                       </div>
                       {!cred.isRevoked && (
-                        <div className="ml-4 px-4 py-2 bg-gray-100 text-gray-500 rounded-lg text-sm font-medium">
-                          Revoke (Feature in development)
+                        <div className="ml-4 px-4 py-2 bg-gradient-to-r from-gray-100 to-slate-100 text-gray-500 rounded-lg text-sm font-medium border border-gray-200">
+                          Revoke (Coming Soon)
                         </div>
                       )}
                     </div>
@@ -560,8 +572,12 @@ export default function UniversityPage() {
                 ))}
               </div>
             ) : (
-              <div className="card text-center py-12">
-                <p className="text-slate-600">No credentials issued yet</p>
+              <div className="card text-center py-16 animate-scale-in">
+                <University className="h-16 w-16 text-slate-300 mx-auto mb-4" />
+                <h3 className="text-2xl font-semibold text-slate-700 mb-2">No Credentials Yet</h3>
+                <p className="text-lg text-slate-600">
+                  You haven't issued any credentials yet. Click "Issue Credential" to get started!
+                </p>
               </div>
             )}
           </div>
