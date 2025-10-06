@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
 import { toast } from 'sonner';
 import { Shield, CheckCircle, XCircle, Loader2, AlertTriangle } from 'lucide-react';
@@ -12,6 +12,9 @@ import { NetworkInfo } from '../components/NetworkInfo';
 export default function TestPage() {
   const { address, isConnected } = useAccount();
   const [activeTab, setActiveTab] = useState('info');
+  const [verifyMetadata, setVerifyMetadata] = useState(null);
+  const [isLoadingVerifyMetadata, setIsLoadingVerifyMetadata] = useState(false);
+  const [currentTxType, setCurrentTxType] = useState(null);
   
   // Form states
   const [universityAddress, setUniversityAddress] = useState('');
@@ -57,6 +60,86 @@ export default function TestPage() {
   });
   console.log(verificationResult);
 
+  // Function to fetch metadata from IPFS
+  const fetchMetadataFromIPFS = async (tokenURI) => {
+    try {
+      // Handle both full URLs and partial URLs
+      const url = tokenURI.startsWith('http') ? tokenURI : `https://${tokenURI}`;
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to fetch metadata');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching metadata:', error);
+      return null;
+    }
+  };
+
+  // Fetch metadata when verification result changes
+  useEffect(() => {
+    if (verificationResult && verificationResult[1] && verificationResult[1].tokenURI) {
+      setIsLoadingVerifyMetadata(true);
+      
+      const fetchMetadata = async () => {
+        const meta = await fetchMetadataFromIPFS(verificationResult[1].tokenURI);
+        setVerifyMetadata(meta);
+        setIsLoadingVerifyMetadata(false);
+      };
+      
+      fetchMetadata();
+    } else {
+      setVerifyMetadata(null);
+      setIsLoadingVerifyMetadata(false);
+    }
+  }, [verificationResult]);
+
+  // Transaction confirmation effects
+  useEffect(() => {
+    if (isSuccess && currentTxType) {
+      switch (currentTxType) {
+        case 'addUniversity':
+          toast.success('✅ University addition confirmed on blockchain!', {
+            description: '🏛️ University has been successfully added to the system.',
+          });
+          break;
+        case 'issueCredential':
+          toast.success('✅ Credential issuance confirmed on blockchain!', {
+            description: '🎓 Academic credential has been successfully issued.',
+          });
+          break;
+        case 'revokeCredential':
+          toast.success('✅ Credential revocation confirmed on blockchain!', {
+            description: '🚫 Academic credential has been successfully revoked.',
+          });
+          break;
+      }
+      setCurrentTxType(null);
+    }
+  }, [isSuccess, currentTxType]);
+
+  useEffect(() => {
+    if (isConfirming && currentTxType) {
+      switch (currentTxType) {
+        case 'addUniversity':
+          toast.loading('⏳ Confirming university addition...', {
+            description: 'Waiting for blockchain confirmation.',
+          });
+          break;
+        case 'issueCredential':
+          toast.loading('⏳ Confirming credential issuance...', {
+            description: 'Waiting for blockchain confirmation.',
+          });
+          break;
+        case 'revokeCredential':
+          toast.loading('⏳ Confirming credential revocation...', {
+            description: 'Waiting for blockchain confirmation.',
+          });
+          break;
+      }
+    }
+  }, [isConfirming, currentTxType]);
+
   // Functions
   const handleAddUniversity = async () => {
     if (!universityAddress) {
@@ -64,15 +147,19 @@ export default function TestPage() {
       return;
     }
     try {
+      setCurrentTxType('addUniversity');
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
         functionName: 'addUniversity',
         args: [universityAddress],
       });
-      toast.success('Transaction submitted! Waiting for confirmation...');
+      toast.info('📤 University addition transaction submitted...', {
+        description: 'Please wait for blockchain confirmation.',
+      });
     } catch (error) {
-      toast.error(error.message || 'Failed to add university');
+      setCurrentTxType(null);
+      toast.error(`❌ Failed to add university: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -85,15 +172,19 @@ export default function TestPage() {
     }
 
     try {
+      setCurrentTxType('issueCredential');
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
         functionName: 'issueCredential',
         args: [studentAddress, studentName, studentId, university, degree, major, issueDate, graduationDate],
       });
-      toast.success('Transaction submitted! Waiting for confirmation...');
+      toast.info('📤 Credential issuance transaction submitted...', {
+        description: 'Please wait for blockchain confirmation.',
+      });
     } catch (error) {
-      toast.error(error.message || 'Failed to issue credential');
+      setCurrentTxType(null);
+      toast.error(`❌ Failed to issue credential: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -103,6 +194,8 @@ export default function TestPage() {
       return;
     }
     try {
+      setVerifyMetadata(null); // Reset metadata for new search
+      setIsLoadingVerifyMetadata(false);
       await refetchVerification();
       toast.success('Credential verification completed');
     } catch (error) {
@@ -116,15 +209,19 @@ export default function TestPage() {
       return;
     }
     try {
+      setCurrentTxType('revokeCredential');
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
         functionName: 'revokeCredential',
         args: [revokeTokenId],
       });
-      toast.success('Transaction submitted! Waiting for confirmation...');
+      toast.info('📤 Credential revocation transaction submitted...', {
+        description: 'Please wait for blockchain confirmation.',
+      });
     } catch (error) {
-      toast.error(error.message || 'Failed to revoke credential');
+      setCurrentTxType(null);
+      toast.error(`❌ Failed to revoke credential: ${error.message || 'Unknown error'}`);
     }
   };
 
@@ -492,31 +589,59 @@ export default function TestPage() {
                           </>
                         )}
                       </div>
+                      
                       {verificationResult[1] && (
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between">
-                            <span className="font-medium">Student Name:</span>
-                            <span>{verificationResult[1].studentName}</span>
+                            <span className="font-medium">Credential ID:</span>
+                            <span className="font-mono">#{verificationResult[1]?.tokenId?.toString() || verifyTokenId}</span>
                           </div>
-                          <div className="flex justify-between">
-                            <span className="font-medium">Student ID:</span>
-                            <span>{verificationResult[1].studentId}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-medium">University:</span>
-                            <span>{verificationResult[1].university}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-medium">Degree:</span>
-                            <span>{verificationResult[1].degree}</span>
-                          </div>
-                          <div className="flex justify-between">
-                            <span className="font-medium">Major:</span>
-                            <span>{verificationResult[1].major}</span>
-                          </div>
+                          
+                          {isLoadingVerifyMetadata ? (
+                            <div className="text-center py-4">
+                              <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-600 mx-auto"></div>
+                              <p className="text-slate-600 mt-2 text-xs">Loading credential details...</p>
+                            </div>
+                          ) : verifyMetadata ? (
+                            <>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Student Name:</span>
+                                <span>{verifyMetadata.studentName || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Student ID:</span>
+                                <span>{verifyMetadata.studentId || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">University:</span>
+                                <span>{verifyMetadata.university || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Degree:</span>
+                                <span>{verifyMetadata.degree || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Major:</span>
+                                <span>{verifyMetadata.major || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Issue Date:</span>
+                                <span>{verifyMetadata.issueDate || 'N/A'}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="font-medium">Graduation Date:</span>
+                                <span>{verifyMetadata.graduationDate || 'N/A'}</span>
+                              </div>
+                            </>
+                          ) : (
+                            <div className="text-xs text-amber-600 bg-amber-50 p-2 rounded">
+                              ⚠️ {verificationResult[1]?.tokenURI ? 'Metadata could not be loaded from IPFS' : 'Metadata not available (old contract structure)'}
+                            </div>
+                          )}
+                          
                           <div className="flex justify-between">
                             <span className="font-medium">Issuer:</span>
-                            <span className="font-mono">{formatAddress(verificationResult[1].issuer)}</span>
+                            <span className="font-mono">{formatAddress(verificationResult[1]?.issuer)}</span>
                           </div>
                         </div>
                       )}

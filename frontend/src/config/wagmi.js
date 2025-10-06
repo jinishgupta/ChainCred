@@ -1,5 +1,5 @@
 import { http, createConfig } from 'wagmi';
-import { injected, metaMask } from 'wagmi/connectors';
+import { injected, metaMask, walletConnect } from 'wagmi/connectors';
 
 // Configure the Polkadot Hub TestNet chain
 export const polkadotHubTestnet = {
@@ -33,7 +33,23 @@ export const config = createConfig({
   chains: [polkadotHubTestnet],
   connectors: [
     injected(),
-    metaMask(),
+    metaMask({
+      dappMetadata: {
+        name: 'ChainCred',
+        url: typeof window !== 'undefined' ? window.location.origin : 'https://chaincred-jmiu.onrender.com',
+        iconUrl: typeof window !== 'undefined' ? `${window.location.origin}/favicon.ico` : 'https://chaincred-jmiu.onrender.com/favicon.ico',
+      },
+    }),
+    walletConnect({
+      projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'your-project-id',
+      metadata: {
+        name: 'ChainCred',
+        description: 'Blockchain-based credential verification system',
+        url: typeof window !== 'undefined' ? window.location.origin : 'https://chaincred-jmiu.onrender.com',
+        icons: [typeof window !== 'undefined' ? `${window.location.origin}/favicon.ico` : 'https://chaincred-jmiu.onrender.com/favicon.ico'],
+      },
+      showQrModal: true,
+    }),
   ],
   transports: {
     [polkadotHubTestnet.id]: http(),

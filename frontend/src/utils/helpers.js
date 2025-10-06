@@ -108,3 +108,42 @@ export const MAJOR_FIELDS = [
   'Artificial Intelligence',
   'Other',
 ];
+
+// Mobile and wallet detection utilities
+export function isMobile() {
+  if (typeof window === 'undefined') return false;
+  return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
+export function isMetaMaskMobile() {
+  if (typeof window === 'undefined') return false;
+  return window.ethereum && window.ethereum.isMetaMask && isMobile();
+}
+
+export function isInWalletBrowser() {
+  if (typeof window === 'undefined') return false;
+  const userAgent = navigator.userAgent;
+  return /MetaMaskMobile|Trust|imToken|Coinbase|SafePal|TokenPocket|BitKeep|OKApp|Binance|Huobi|KuCoin|Crypto\.com|Rainbow|Metamask/i.test(userAgent);
+}
+
+export function getWalletConnectionInstructions() {
+  if (isInWalletBrowser()) {
+    return {
+      type: 'in-app',
+      title: 'Connect Wallet',
+      description: 'You\'re using a wallet browser. Use the "Injected" or "MetaMask" option to connect.',
+    };
+  } else if (isMobile()) {
+    return {
+      type: 'mobile',
+      title: 'Mobile Connection',
+      description: 'Use "WalletConnect" to scan QR code with your mobile wallet app, or open this site in your wallet\'s browser.',
+    };
+  } else {
+    return {
+      type: 'desktop',
+      title: 'Desktop Connection',
+      description: 'Install MetaMask browser extension or use WalletConnect for mobile wallet.',
+    };
+  }
+}

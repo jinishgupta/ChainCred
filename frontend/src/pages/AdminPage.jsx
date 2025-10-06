@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
 import { toast } from 'sonner';
 import { Shield, CheckCircle, XCircle, Loader2, AlertCircle, Clock } from 'lucide-react';
@@ -8,9 +8,47 @@ import { formatAddress } from '../utils/helpers';
 
 export default function AdminPage() {
   const { address, isConnected } = useAccount();
+  const [currentTxType, setCurrentTxType] = useState(null);
 
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
+
+  // Transaction confirmation effects
+  useEffect(() => {
+    if (isSuccess && currentTxType) {
+      switch (currentTxType) {
+        case 'approve':
+          toast.success('✅ University approval confirmed on blockchain!', {
+            description: '🎉 University has been successfully approved and can now issue credentials.',
+          });
+          break;
+        case 'reject':
+          toast.success('✅ University rejection confirmed on blockchain!', {
+            description: '🚫 University application has been rejected.',
+          });
+          break;
+      }
+      setCurrentTxType(null);
+      setTimeout(() => refetch(), 2000);
+    }
+  }, [isSuccess, currentTxType]);
+
+  useEffect(() => {
+    if (isConfirming && currentTxType) {
+      switch (currentTxType) {
+        case 'approve':
+          toast.loading('⏳ Confirming university approval...', {
+            description: 'Waiting for blockchain confirmation.',
+          });
+          break;
+        case 'reject':
+          toast.loading('⏳ Confirming university rejection...', {
+            description: 'Waiting for blockchain confirmation.',
+          });
+          break;
+      }
+    }
+  }, [isConfirming, currentTxType]);
 
   // Check if current address is admin
   const { data: isAdmin } = useReadContract({
@@ -33,36 +71,41 @@ export default function AdminPage() {
   const handleApprove = async (universityAddress) => {
     try {
       console.log(universityAddress);
+      setCurrentTxType('approve');
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
         functionName: 'approveUniversity',
         args: [universityAddress],
       });
-      toast.success('University approval initiated!');
+      toast.info('📤 University approval transaction submitted...', {
+        description: 'Please wait for blockchain confirmation.',
+      });
     } catch (error) {
-      toast.error(error.message || 'Failed to approve university');
+      setCurrentTxType(null);
+      toast.error(`❌ Failed to approve university: ${error.message || 'Unknown error'}`);
     }
   };
 
   const handleReject = async (universityAddress) => {
     try {
+      setCurrentTxType('reject');
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
         functionName: 'rejectUniversity',
         args: [universityAddress],
       });
-      toast.success('University rejection initiated!');
+      toast.info('📤 University rejection transaction submitted...', {
+        description: 'Please wait for blockchain confirmation.',
+      });
     } catch (error) {
-      toast.error(error.message || 'Failed to reject university');
+      setCurrentTxType(null);
+      toast.error(`❌ Failed to reject university: ${error.message || 'Unknown error'}`);
     }
   };
 
-  // Refetch on success
-  if (isSuccess) {
-    setTimeout(() => refetch(), 2000);
-  }
+  // Removed automatic refetch - now handled by useEffect
 
   if (!isConnected) {
     return (

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useWriteContract, useReadContract, useWaitForTransactionReceipt } from 'wagmi';
 import { toast } from 'sonner';
-import { University, Plus, List, Loader2, AlertCircle, CheckCircle, Clock } from 'lucide-react';
+import { University, Plus, User2, AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import { CONTRACT_ADDRESS } from '../config/wagmi';
 import { CHAINCRED_ABI } from '../config/abi';
 import { formatAddress, formatDate, DEGREE_TYPES, MAJOR_FIELDS } from '../utils/helpers';
@@ -32,6 +32,9 @@ export default function UniversityPage() {
   const { writeContract, data: hash, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
+  // Track the current transaction type for proper messaging
+  const [currentTxType, setCurrentTxType] = useState(null);
+
   const { data: universityInfo, refetch: refetchUniversityInfo } = useReadContract({
     address: CONTRACT_ADDRESS,
     abi: CHAINCRED_ABI,
@@ -60,11 +63,49 @@ export default function UniversityPage() {
   }, [universityInfo]);
   
   useEffect(() => {
-    if (isSuccess) {
+    if (isSuccess && currentTxType) {
+      // Show success toast based on transaction type
+      switch (currentTxType) {
+        case 'registration':
+          toast.success('🎉 University registration confirmed on blockchain!', {
+            description: 'Your registration is now awaiting admin approval.',
+            duration: 5000,
+          });
+          break;
+        case 'credential':
+          toast.success('🎓 Credential issued successfully!', {
+            description: 'The credential has been minted and stored on blockchain.',
+            duration: 5000,
+          });
+          break;
+        case 'revoke':
+          toast.success('🚫 Credential revoked successfully!', {
+            description: 'The credential has been revoked on blockchain.',
+            duration: 5000,
+          });
+          break;
+        default:
+          toast.success('✅ Transaction confirmed on blockchain!');
+      }
+      
+      // Reset transaction type and refetch data
+      setCurrentTxType(null);
       refetchUniversityInfo();
       refetch();
     }
-  }, [isSuccess]);
+  }, [isSuccess, currentTxType, refetchUniversityInfo, refetch]);
+
+  // Show confirmation toast when transaction is being confirmed
+  useEffect(() => {
+    if (isConfirming && currentTxType) {
+      toast.loading('⏳ Confirming transaction on blockchain...', {
+        id: 'confirming-tx',
+        description: 'Please wait while your transaction is being confirmed.',
+      });
+    } else {
+      toast.dismiss('confirming-tx');
+    }
+  }, [isConfirming, currentTxType]);
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -85,6 +126,7 @@ export default function UniversityPage() {
     }
  
     try {
+      setCurrentTxType('registration');
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
@@ -95,9 +137,12 @@ export default function UniversityPage() {
           registrationData.registrationNumber,
         ],
       });
-      toast.success('University registration submitted! Awaiting admin approval.');
+      toast.info('📤 Registration transaction submitted to blockchain...', {
+        description: 'Please wait for confirmation.',
+      });
     } catch (error) {
-      toast.error(error.message || 'Failed to register university');
+      setCurrentTxType(null);
+      toast.error(`❌ Registration failed: ${error.message || 'Unknown error'}`);
     }
   };
   
@@ -112,7 +157,9 @@ export default function UniversityPage() {
     try {
       // Upload credential metadata to IPFS
       setIsUploadingToIPFS(true);
-      toast.info('Uploading credential metadata to IPFS...');
+      toast.info('📤 Uploading credential metadata to IPFS...', {
+        description: 'Preparing credential data for blockchain storage.',
+      });
       console.log("uploading to ipfs")
       console.log(formData);
       const result = await uploadMetadataToIPFS({
@@ -127,9 +174,12 @@ export default function UniversityPage() {
       });
       console.log(result);
       setIsUploadingToIPFS(false);
-      toast.success('Metadata uploaded to IPFS!');
+      toast.success('✅ Metadata uploaded to IPFS successfully!');
+      
       const tokenURI = result.metadataUrl;
+      
       // Now mint the credential with IPFS CID
+      setCurrentTxType('credential');
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
@@ -139,25 +189,32 @@ export default function UniversityPage() {
           tokenURI,
         ],
       });
-      toast.success('Credential issuance initiated!');
+      toast.info('📤 Credential issuance transaction submitted...', {
+        description: 'Please wait for blockchain confirmation.',
+      });
     } catch (error) {
       console.log(error.message);
       setIsUploadingToIPFS(false);
-      toast.error(error.message || 'Failed to issue credential');
+      setCurrentTxType(null);
+      toast.error(`❌ Failed to issue credential: ${error.message || 'Unknown error'}`);
     }
   };
 
   const handleRevoke = async (tokenId) => {
     try {
+      setCurrentTxType('revoke');
       await writeContract({
         address: CONTRACT_ADDRESS,
         abi: CHAINCRED_ABI,
         functionName: 'revokeCredential',
         args: [tokenId],
       });
-      toast.success('Credential revocation initiated!');
+      toast.info('📤 Credential revocation transaction submitted...', {
+        description: 'Please wait for blockchain confirmation.',
+      });
     } catch (error) {
-      toast.error(error.message || 'Failed to revoke credential');
+      setCurrentTxType(null);
+      toast.error(`❌ Failed to revoke credential: ${error.message || 'Unknown error'}`);
     }
   };
 
