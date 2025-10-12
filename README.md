@@ -1,4 +1,4 @@
-# ChainCred - Blockchain Credential Verification for Latin America
+# ChainCred - Blockchain Credential Verification
 
 ![ChainCred Banner](https://img.shields.io/badge/Built%20on-Polkadot%20Paseo-E6007A?style=for-the-badge&logo=polkadot)
 ![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity)
