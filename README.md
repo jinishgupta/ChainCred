@@ -7,13 +7,13 @@
 
 ## 🏆 **Product Track Submission**
 
-ChainCred is a decentralized platform that eliminates credential fraud in Latin America by issuing tamper-proof digital credentials as NFTs on the Polkadot Paseo Testnet.
+ChainCred is a decentralized platform that eliminates credential fraud in the world by issuing tamper-proof digital credentials as NFTs on the Polkadot Paseo Testnet.
 
 ---
 
 ## 🎯 **The Problem**
 
-- **30-40%** credential fraud rate in Latin America
+- **30-40%** credential fraud rate 
 - **2-4 weeks** average verification time
 - **$1M+** annual cost to employers
 - No standardized cross-border verification system
@@ -255,26 +255,6 @@ Application will be available at: `http://localhost:5173`
 
 ---
 
-## 🎥 **Demo Video**
-
-### Video Structure (3 minutes)
-
-**0:00-0:20** - Problem Introduction
-- Credential fraud statistics
-- ChainCred solution overview
-
-**0:20-2:40** - Product Demo (80% of video)
-- University issuing credential
-- Student viewing credential
-- Employer verifying credential
-- Show blockchain proof
-
-**2:40-3:00** - Impact & Tech Stack
-- Built on Polkadot Paseo
-- Open source and ready for deployment
-
----
-
 ## 🔒 **Security Features**
 
 - ✅ Role-based access control
@@ -282,33 +262,6 @@ Application will be available at: `http://localhost:5173`
 - ✅ Immutable on-chain storage
 - ✅ Cryptographic proof of authenticity
 - ✅ No centralized database vulnerability
-
----
-
-## 🌐 **Deployment to Production**
-
-### Option 1: Vercel (Frontend)
-
-```bash
-cd frontend
-npm run build
-# Deploy to Vercel
-vercel --prod
-```
-
-### Option 2: Netlify
-
-```bash
-cd frontend
-npm run build
-# Deploy dist/ folder to Netlify
-```
-
-### Smart Contract Verification
-
-```bash
-npx hardhat verify --network paseo CONTRACT_ADDRESS
-```
 
 ---
 
@@ -349,35 +302,16 @@ npx hardhat verify --network paseo CONTRACT_ADDRESS
 
 ---
 
-## 🤝 **Contributing**
-
-Contributions are welcome! Please follow these steps:
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
----
-
 ## 📄 **License**
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 👥 **Team**
-
-Built with ❤️ for the Latin American Hackathon 2025
-
----
-
 ## 📞 **Support**
 
 For questions or support:
-- GitHub Issues: [Create an issue](https://github.com/yourusername/chaincred/issues)
-- Email: support@chaincred.io
+- Email: jinish.gupta17@gmail.com
 
 ---
 
@@ -386,29 +320,3 @@ For questions or support:
 - Polkadot/Paseo for the blockchain infrastructure
 - OpenZeppelin for secure smart contract libraries
 - Wagmi for seamless Web3 integration
-- The Latin American developer community
-
----
-
-## 📸 **Screenshots**
-
-### Homepage
-[Beautiful landing page with hero section]
-
-### University Portal
-[Issue credential interface]
-
-### Student Portal
-[View credentials with share options]
-
-### Verification Page
-[Instant verification results]
-
-### Test Page
-[Comprehensive testing interface for judges]
-
----
-
-**Built for Latin American Hackathon 2025 - Product Track**
-
-⭐ **Star this repo if you find it useful!**
